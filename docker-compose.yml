@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis
+    container_name: 'IHCE-Inc-Redis-Cluster'
+    ports:
+      - "6379:6379"
+    command: >
+      bash -c "touch /redis.conf &&
+               echo 'maxmemory 700mb' > /redis.conf &&
+               echo 'maxmemory-policy allkeys-lru' >> /redis.conf &&
+               echo 'maxmemory-samples 5' >> /redis.conf &&
+               redis-server /redis.conf"
+    volumes:
+      - redis-data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 2G
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [ node.role == manager ]
+
+volumes:
+  redis-data:
+
+
+#
+#  fastapi-app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: 'fastapi-app'
+#    ports:
+#      - "8000:8000"
+#    environment:
+#      - REDIS_HOST=redis
+#      - REDIS_PORT=6379
+#    depends_on:
+#      - redis
+#    deploy:
+#      replicas: 1
+#      placement:
+#        constraints: [node.role == manager]
+#      resources:
+#        limits:
+#          cpus: "1.00"
+#          memory: 512M
+#      restart_policy:
+#        condition: on-failure
