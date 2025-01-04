@@ -384,6 +384,13 @@ PublishArtifacts() {
     # Push Docker image to the registry
     log_table_header "🔄 Pushing Docker image to the Github Container Registry..."
 
+    # Set environment-specific variables
+    CI_REGISTRY_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
+    CI_PIPELINE_IID="${GITHUB_RUN_NUMBER}"
+
+    # Convert repository name to lowercase for Docker compatibility
+    CI_REGISTRY_IMAGE=$(echo "$CI_REGISTRY_IMAGE" | tr '[:upper:]' '[:lower:]')
+
     # Load the Docker image from the tar file
     IMAGE_TAR="$ARTIFACTS_DIR/pipeline-artifact-$CI_PIPELINE_IID.tar"
 
@@ -401,7 +408,7 @@ PublishArtifacts() {
         log_table_header "Artifactory Images"
         docker images
         draw_line
-        docker tag $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID $CI_REGISTRY_IMAGE:$TargetVersion
+        docker tag $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID $CI_REGISTRY_IMAGE:0.1.0
         echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
         if docker --debug push $CI_REGISTRY_IMAGE:$TargetVersion; then
             log_info "\033[1m\033[0;34mCI Publish Artifacts Log Summary \033[0m"
@@ -457,7 +464,7 @@ case $COMMAND in
         ContainerImageScan
         ;;
     Publish)
-        SemanticVersioning
+#        SemanticVersioning
         PublishArtifacts
         ;;
     CleanWorkspace)
