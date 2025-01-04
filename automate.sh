@@ -464,7 +464,7 @@ case $COMMAND in
         ContainerImageScan
         ;;
     Publish)
-#        SemanticVersioning
+        SemanticVersioning
         PublishArtifacts
         ;;
     CleanWorkspace)
