@@ -27,28 +27,3 @@ services:
 
 volumes:
   redis-data:
-
-
-#
-#  fastapi-app:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    container_name: 'fastapi-app'
-#    ports:
-#      - "8000:8000"
-#    environment:
-#      - REDIS_HOST=redis
-#      - REDIS_PORT=6379
-#    depends_on:
-#      - redis
-#    deploy:
-#      replicas: 1
-#      placement:
-#        constraints: [node.role == manager]
-#      resources:
-#        limits:
-#          cpus: "1.00"
-#          memory: 512M
-#      restart_policy:
-#        condition: on-failure

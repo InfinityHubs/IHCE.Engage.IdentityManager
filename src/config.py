@@ -44,19 +44,23 @@ class Configs(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 30  # 30 days
 
     #Redis Connector
-    REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")
-    REDIS_PORT: str = os.getenv("REDIS_PORT", "6379")
+    REDIS_HOST: str = os.getenv("REDIS_HOST", "redis-11916.c14.us-east-1-3.ec2.redns.redis-cloud.com")
+    REDIS_PORT: str = os.getenv("REDIS_PORT", "11916")
+    REDIS_PASSWORD: str = os.getenv("REDIS_PASSWORD", "FIqJ3HuO4zL3kJr0uCZfAeSqsklNZcFC")
+    REDIS_USERNAME: str = os.getenv("REDIS_USERNAME", "default")
 
     # Authentication settings
     HMAC_SECRET_KEY: str = os.getenv("HMAC_SECRET_KEY", "TheInvincible_rANVAN2dot0")
     HMAC_TOKEN_EXPIRATION_SECONDS: int = 24 * 60 * 60  # 86,400 seconds i.e 1 day
 
     # Database settings
-    DB_HOST: str = os.getenv("DB_HOST", "localhost")
+    # DB_HOST: str = os.getenv("DB_HOST", "localhost")
+    DB_HOST: str = os.getenv("DB_HOST", "5.223.48.13")
     DB_USER: str = os.getenv("DB_USER", "postgres")
     DB_PORT: str = os.getenv("DB_PORT", "5432")
-    DB_PASSWORD: str = os.getenv("DB_PASSWORD","_root77")
-    DB_NAME: str = os.getenv("DB_NAME", "dbIHCEIdentity")  # Database name from infrastructure
+    DB_PASSWORD: str = os.getenv("DB_PASSWORD","root77Dot0#1125")
+    # DB_PASSWORD: str = os.getenv("DB_PASSWORD","_root77")
+    DB_NAME: str = os.getenv("DB_NAME", "dbIHCEIdentity")
     DB_DIALECT: str = os.getenv("DB_DIALECT", "postgresql")
 
     # Database URI

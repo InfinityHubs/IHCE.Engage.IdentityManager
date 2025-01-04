@@ -11,6 +11,8 @@ class RedisClientConnector:
             self.client = redis.Redis(
                 host=AppConfigs.REDIS_HOST,
                 port=AppConfigs.REDIS_PORT,
+                password=AppConfigs.REDIS_PASSWORD,
+                username=AppConfigs.REDIS_USERNAME,
                 decode_responses=True,
             )
             self.client.ping()  # Check connection

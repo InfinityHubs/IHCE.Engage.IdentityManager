@@ -2,6 +2,19 @@
 pip3 install -r src/requirements.txt
 pip3 install --no-cache-dir -r src/requirements.txt
 
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+requests
+python-dotenv
+psycopg2-binary
+sqlalchemy
+alembic
+redis
+aiosmtplib
+
+
 
 pip3 freeze
 
@@ -10,3 +23,11 @@ uvicorn src.main:app --reload
 uvicorn src.main:app --reload --host 0.0.0.0 --port 8080
 
 pip3 install sqlalchemy psycopg2 psycopg2-binary
+
+docker ps
+docker images
+docker run -it ihce-ims sh
+     exit
+docker run -p 8000:8000 ihce-ims:latest
+
+
