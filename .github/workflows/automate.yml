@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     container: docker:20.10.7
     steps:
+      - name: Install Bash
+        run: apk add --no-cache bash
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
