@@ -56,6 +56,8 @@ jobs:
           name: Build-Runner-Artifacts
           path: ./Build-Runner-Artifacts/
       - name: Publish
+        env:
+          GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
         run: sh ./automate.sh --Target Publish
       - name: Clean Workspace
         run: sh ./automate.sh --Target CleanWorkspace

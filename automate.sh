@@ -390,9 +390,9 @@ PublishArtifacts() {
 
     # Convert repository name to lowercase for Docker compatibility
     CI_REGISTRY_IMAGE=$(echo "$CI_REGISTRY_IMAGE" | tr '[:upper:]' '[:lower:]')
-    CI_REGISTRY_PASSWORD="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"
+    CI_REGISTRY_PASSWORD="${GHP_TOKEN}"
     CI_REGISTRY_USER="${GITHUB_ACTOR}"
-    TargetVersion=0.1.7
+    TargetVersion=0.1.8
 
     # Load the Docker image from the tar file
     IMAGE_TAR="$ARTIFACTS_DIR/pipeline-artifact-$CI_PIPELINE_IID.tar"
