@@ -128,7 +128,7 @@ Bootstrap() {
 
     if [ -z "$VALUE" ]; then
         log_error "Error: $VAR is not set or empty."
-        exit 1  # Exit if any required variable is not found
+#        exit 1  # Exit if any required variable is not found
     else
         # Append the variable to the JSON object
         JSON_OBJECT="$JSON_OBJECT\"$VAR\": \"$VALUE\","
