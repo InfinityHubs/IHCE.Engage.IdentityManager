@@ -390,7 +390,7 @@ PublishArtifacts() {
 
     # Convert repository name to lowercase for Docker compatibility
     CI_REGISTRY_IMAGE=$(echo "$CI_REGISTRY_IMAGE" | tr '[:upper:]' '[:lower:]')
-    CI_REGISTRY_PASSWORD="${{ secrets.IHCE_GHCR_SRE }}"
+    CI_REGISTRY_PASSWORD="${secrets.IHCE_GHCR_SRE}"
     CI_REGISTRY_USER="${GITHUB_ACTOR}"
     TargetVersion=0.1.7
 
