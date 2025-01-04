@@ -9,17 +9,14 @@ fi
 
 # Function to return the list of required environment variables
 get_required_vars() {
-    echo "GITHUB_ACTION \
-    GITHUB_ACTION_PATH \
-    GITHUB_ACTION_REPOSITORY \
+    echo "CI \
+    GITHUB_ACTION \
     GITHUB_ACTIONS \
     GITHUB_ACTOR \
     GITHUB_API_URL \
-    GITHUB_BASE_REF \
     GITHUB_ENV \
     GITHUB_EVENT_NAME \
     GITHUB_EVENT_PATH \
-    GITHUB_HEAD_REF \
     GITHUB_JOB \
     GITHUB_OUTPUT \
     GITHUB_PATH \
@@ -38,8 +35,7 @@ get_required_vars() {
     GITHUB_STEP_SUMMARY \
     GITHUB_WORKFLOW \
     GITHUB_WORKSPACE \
-    GITHUB_RETENTION_DAYS \
-    GITHUB_TOKEN"
+    GITHUB_RETENTION_DAYS"
 }
 
 # Function to check and install curl if not available
