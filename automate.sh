@@ -284,29 +284,33 @@ ContainerImageScan() {
 
 
 SemanticVersioning1() {
+    echo "SV-S1"
     # Default version components
     MAJOR=${1:-0}    # Default MAJOR version to 0 if not provided
     MINOR=${2:-1}    # Default MINOR version to 1 if not provided
     PATCH=${3:-0}    # Default PATCH version to 0
-
+    echo "SV-S2-${MAJOR}-${MINOR}-${PATCH}"
     # Ensure Git is available
     if ! command -v git &>/dev/null; then
         echo "Git not found. Installing..."
         apk add --no-cache git
     fi
 
+    echo "SV-S3"
     git --version
 
+    echo "SV-S4.1"
     # Fetch full Git history if shallow
     if [ -f .git/shallow ]; then
         echo "Fetching full Git history..."
         git fetch --unshallow
     fi
 
+    echo "SV-S4.2"
     # Get the total commits on the main branch
     TotalMainCommits=$(git rev-list --count origin/main)
     TargetPatchVersion=$((TotalMainCommits + 1))
-
+    echo "SV-S4.3"
     # Log basic info
     echo "Commit Branch --> $GITHUB_REF_NAME"
     echo "Total Main Commits --> $TotalMainCommits"
