@@ -172,6 +172,9 @@ BuildAndPackage() {
     CI_REGISTRY_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
     CI_PIPELINE_IID="${GITHUB_RUN_NUMBER}"
 
+    # Convert repository name to lowercase for Docker compatibility
+    CI_REGISTRY_IMAGE=$(echo "$CI_REGISTRY_IMAGE" | tr '[:upper:]' '[:lower:]')
+
     # Build Docker image
     log_info "🚀🔨 \033[1mHold tight! Docker build initiated.......\033[0m 🔨🚀\n\n"
     if docker build --pull --no-cache -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID .; then
