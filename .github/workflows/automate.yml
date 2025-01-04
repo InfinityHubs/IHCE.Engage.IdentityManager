@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Ensure full history is fetched, useful for Git operations during publish.
       - name: Build
         run: sh ./automate.sh --Target Build
       - name: Save Artifacts
