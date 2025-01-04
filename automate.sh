@@ -197,7 +197,7 @@ BuildAndPackage() {
     # Validate if the image exists
     if docker inspect "$CI_REGISTRY_IMAGE:$CI_PIPELINE_IID" > /dev/null 2>&1; then
         log_success "✅ [SUCCESS] Image $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID exists."
-        docker save $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID > $ARTIFACTS_DIR/$CI_PROJECT_NAME-artifact-$CI_PIPELINE_IID.tar
+        docker save $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID > $ARTIFACTS_DIR/pipeline-artifact-$CI_PIPELINE_IID.tar
         # docker create --name temp_container "$CI_REGISTRY_IMAGE:$CI_PIPELINE_IID"
         # # docker export temp_container | tar -tv | sort -u
         # docker export temp_container > $ARTIFACTS_DIR/automate-ci-builder-temp-container.tar
@@ -222,7 +222,7 @@ ContainerImageScan() {
     log_table_header "🔄 Container-Image-Scan"
 
     # Load the Docker image from the tar file
-    IMAGE_TAR="$ARTIFACTS_DIR/$CI_PROJECT_NAME-artifact-$CI_PIPELINE_IID.tar"
+    IMAGE_TAR="$ARTIFACTS_DIR/pipeline-artifact-$CI_PIPELINE_IID.tar"
 
     if [ ! -f "$IMAGE_TAR" ]; then
         echo "❌ Tar file not found: $IMAGE_TAR"
@@ -382,10 +382,10 @@ update_patch_version() {
 PublishArtifacts() {
 
     # Push Docker image to the registry
-    log_table_header "🔄 Pushing Docker image to the GitLab Container Registry..."
+    log_table_header "🔄 Pushing Docker image to the Github Container Registry..."
 
     # Load the Docker image from the tar file
-    IMAGE_TAR="$ARTIFACTS_DIR/$CI_PROJECT_NAME-artifact-$CI_PIPELINE_IID.tar"
+    IMAGE_TAR="$ARTIFACTS_DIR/pipeline-artifact-$CI_PIPELINE_IID.tar"
 
     if [ ! -f "$IMAGE_TAR" ]; then
         echo "❌ Tar file not found: $IMAGE_TAR"
