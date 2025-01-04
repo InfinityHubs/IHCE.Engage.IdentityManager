@@ -38,30 +38,33 @@ jobs:
 #          name: Build-Runner-Artifacts
 #          path: Build-Runner-Artifacts
 #
-  Publish-Stable-Branch-Artifacts:
-    name: Publish Stable Branch Artifacts
-    runs-on: ubuntu-latest
-    container: docker:20.10.7
-    needs:
-      - Build-and-Package
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # Ensure full history is fetched, useful for Git operations during publish.
-      - name: Download Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: Build-Runner-Artifacts
-          path: ./Build-Runner-Artifacts/
-      - name: Publish
-        env:
-          GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
-        run: sh ./automate.sh --Target Publish
-      - name: Clean Workspace
-        run: sh ./automate.sh --Target CleanWorkspace
+
+
+#  Publish-Stable-Branch-Artifacts:
+#    name: Publish Stable Branch Artifacts
+#    runs-on: ubuntu-latest
+#    container: docker:20.10.7
+#    needs:
+#      - Build-and-Package
+#    if: github.ref == 'refs/heads/main'
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 0 # Ensure full history is fetched, useful for Git operations during publish.
+#      - name: Download Artifacts
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: Build-Runner-Artifacts
+#          path: ./Build-Runner-Artifacts/
+#      - name: Publish
+#        env:
+#          GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
+#        run: sh ./automate.sh --Target Publish
+#      - name: Clean Workspace
+#        run: sh ./automate.sh --Target CleanWorkspace
 #
+
 #  Publish-Artifacts-Stable-Branch:
 #    name: Publish Artifacts (Stable Branch)
 #    runs-on: ubuntu-latest

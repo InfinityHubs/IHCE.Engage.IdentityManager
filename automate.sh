@@ -282,6 +282,75 @@ ContainerImageScan() {
     echo "✅ Scan completed successfully"
 }
 
+
+SemanticVersioning1() {
+    # Default version components
+    MAJOR=${1:-0}    # Default MAJOR version to 0 if not provided
+    MINOR=${2:-1}    # Default MINOR version to 1 if not provided
+    PATCH=${3:-0}    # Default PATCH version to 0
+
+    # Ensure Git is available
+    if ! command -v git &>/dev/null; then
+        echo "Git not found. Installing..."
+        apk add --no-cache git
+    fi
+
+    git --version
+
+    # Fetch full Git history if shallow
+    if [ -f .git/shallow ]; then
+        echo "Fetching full Git history..."
+        git fetch --unshallow
+    fi
+
+    # Get the total commits on the main branch
+    TotalMainCommits=$(git rev-list --count origin/main)
+    TargetPatchVersion=$((TotalMainCommits + 1))
+
+    # Log basic info
+    echo "Commit Branch --> $GITHUB_REF_NAME"
+    echo "Total Main Commits --> $TotalMainCommits"
+
+    # Determine the version suffix based on the branch type
+    case "$GITHUB_REF_NAME" in
+        main)
+            PATCH=$TargetPatchVersion
+            ;;
+        develop)
+            PATCH="$TargetPatchVersion-beta$GITHUB_RUN_NUMBER"
+            ;;
+        feature/*)
+            PATCH="$TargetPatchVersion-alpha$GITHUB_RUN_NUMBER"
+            ;;
+        bugfix/*)
+            PATCH="$TargetPatchVersion-preview$GITHUB_RUN_NUMBER"
+            ;;
+        hotfix/*)
+            PATCH="$TargetPatchVersion-hf$GITHUB_RUN_NUMBER"
+            ;;
+        release/*)
+            PATCH="$TargetPatchVersion-rc$GITHUB_RUN_NUMBER"
+            ;;
+        *)
+            PATCH="$TargetPatchVersion-unstable$GITHUB_RUN_NUMBER"
+            echo "Warning: Branch type not recognized. Using unstable version suffix."
+            ;;
+    esac
+
+    # Construct the semantic version
+    TargetVersion="$MAJOR.$MINOR.$PATCH"
+
+    # Export the version for further use in CI/CD pipelines
+    export TargetVersion
+
+    # Output the new semantic version
+    # shellcheck disable=SC3037
+    echo -e "\033[1m\033[0;34mSemantic Versioning\033[0m"
+    echo "----------------------------------------------"
+    echo "| VERSION       | $TargetVersion"
+    echo "----------------------------------------------"
+}
+
 # Function to Semantic Versioning
 SemanticVersioning() {
 
@@ -290,6 +359,7 @@ SemanticVersioning() {
     PATCH=${3:-0}
 
     # Ensure Git is installed
+    # shellcheck disable=SC3020
     if ! command -v git &>/dev/null; then
         apk add --no-cache git
     fi
@@ -460,8 +530,9 @@ fi
 # Command Dispatcher
 case $COMMAND in
     Build)
-        Bootstrap
-        BuildAndPackage
+        SemanticVersioning1
+#        Bootstrap
+#        BuildAndPackage
         ;;
     Scan)
         ContainerImageScan
