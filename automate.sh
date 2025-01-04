@@ -168,6 +168,10 @@ BuildAndPackage() {
     docker system prune --force --filter "until=24h"
     draw_line  # Draw line after cleanup operation
 
+    # Set environment-specific variables
+    CI_REGISTRY_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
+    CI_PIPELINE_IID="${GITHUB_RUN_NUMBER}"
+
     # Build Docker image
     log_info "🚀🔨 \033[1mHold tight! Docker build initiated.......\033[0m 🔨🚀\n\n"
     if docker build --pull --no-cache -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID .; then
@@ -444,7 +448,7 @@ fi
 case $COMMAND in
     Build)
         Bootstrap
-#        BuildAndPackage
+        BuildAndPackage
         ;;
     Scan)
         ContainerImageScan
