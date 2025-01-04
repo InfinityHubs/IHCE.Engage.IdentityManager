@@ -1,4 +1,4 @@
-# InfinityHubs Code Usage Policy
+# InfinityHubs Connected Enterprises Code Usage Guidelines
 
 ## 1. Policy Overview
 
