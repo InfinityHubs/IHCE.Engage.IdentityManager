@@ -1,5 +1,5 @@
 assembly-versioning-scheme: MajorMinorPatch
-mode: Mainline
+mode: ManualDeployment
 branches: {}
 ignore:
   sha: []
