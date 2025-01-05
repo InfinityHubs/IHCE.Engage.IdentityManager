@@ -295,9 +295,8 @@ PublishArtifacts() {
     # Convert repository name to lowercase for Docker compatibility
     CI_REGISTRY_USER="${GITHUB_ACTOR}"
     CI_REGISTRY_PASSWORD="${GHP_TOKEN}"
-    TargetVersion="$SemanticTargetVersion"
+    TargetVersion="${GHP_STV}"
     CI_REGISTRY_IMAGE=$(echo "$CI_REGISTRY_IMAGE" | tr '[:upper:]' '[:lower:]')
-
 
 
     # Load the Docker image from the tar file
@@ -341,11 +340,8 @@ CleanWorkspace() {
     rm -rf $ARTIFACTS_DIR
 }
 
-# Initialize variables
+# Parse the command-line arguments
 COMMAND=""
-SemanticTargetVersion=""
-
-# Parse arguments
 # shellcheck disable=SC3010
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -353,35 +349,25 @@ while [[ $# -gt 0 ]]; do
             COMMAND="$2"
             shift 2
             ;;
-        --Version)
-            SemanticTargetVersion="$2"
-            shift 2
-            ;;
         *)
             log_error "Unknown option: $1"
-            log_error "Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace} [--Version <version> (required for Publish)]"
+            log_error "Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace}"
             exit 1
             ;;
     esac
 done
 
-# Validate the COMMAND
+# Validate if the COMMAND is provided
 # shellcheck disable=SC3010
 if [[ -z "$COMMAND" ]]; then
-    log_error "No command specified. Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace} [--Version <version> (required for Publish)]"
-    exit 1
-fi
-
-# Validate the Version for Publish
-# shellcheck disable=SC3010
-if [[ "$COMMAND" == "Publish" && -z "$VERSION" ]]; then
-    log_error "No version specified for Publish. Usage: $0 --Target Publish --Version <version>"
+    log_error "No command specified. Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace}"
     exit 1
 fi
 
 # Command Dispatcher
 case $COMMAND in
     Build)
+#        SemanticVersioning1
         Bootstrap
         BuildAndPackage
         ;;
@@ -389,6 +375,7 @@ case $COMMAND in
         ContainerImageScan
         ;;
     Publish)
+#        SemanticVersioning
         PublishArtifacts
         ;;
     CleanWorkspace)
@@ -399,3 +386,63 @@ case $COMMAND in
         exit 1
         ;;
 esac
+
+#
+## Initialize variables
+#COMMAND=""
+#SemanticTargetVersion=""
+#
+## Parse arguments
+## shellcheck disable=SC3010
+#while [[ $# -gt 0 ]]; do
+#    case "$1" in
+#        --Target)
+#            COMMAND="$2"
+#            shift 2
+#            ;;
+#        --Version)
+#            SemanticTargetVersion="$2"
+#            shift 2
+#            ;;
+#        *)
+#            log_error "Unknown option: $1"
+#            log_error "Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace} [--Version <version> (required for Publish)]"
+#            exit 1
+#            ;;
+#    esac
+#done
+#
+## Validate the COMMAND
+## shellcheck disable=SC3010
+#if [[ -z "$COMMAND" ]]; then
+#    log_error "No command specified. Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace} [--Version <version> (required for Publish)]"
+#    exit 1
+#fi
+#
+## Validate the Version for Publish
+## shellcheck disable=SC3010
+#if [[ "$COMMAND" == "Publish" && -z "$VERSION" ]]; then
+#    log_error "No version specified for Publish. Usage: $0 --Target Publish --Version <version>"
+#    exit 1
+#fi
+#
+## Command Dispatcher
+#case $COMMAND in
+#    Build)
+#        Bootstrap
+#        BuildAndPackage
+#        ;;
+#    Scan)
+#        ContainerImageScan
+#        ;;
+#    Publish)
+#        PublishArtifacts
+#        ;;
+#    CleanWorkspace)
+#        CleanWorkspace
+#        ;;
+#    *)
+#        log_error "Invalid command: $COMMAND. Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace}"
+#        exit 1
+#        ;;
+#esac
