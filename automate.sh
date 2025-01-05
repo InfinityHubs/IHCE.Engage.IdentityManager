@@ -282,176 +282,6 @@ ContainerImageScan() {
     echo "✅ Scan completed successfully"
 }
 
-
-SemanticVersioning1() {
-    echo "SV-S1"
-    # Default version components
-    MAJOR=${1:-0}    # Default MAJOR version to 0 if not provided
-    MINOR=${2:-1}    # Default MINOR version to 1 if not provided
-    PATCH=${3:-0}    # Default PATCH version to 0
-    echo "SV-S2-${MAJOR}-${MINOR}-${PATCH}"
-    # Ensure Git is available
-    if ! command -v git &>/dev/null; then
-        echo "Git not found. Installing..."
-        apk add --no-cache git
-    fi
-
-    echo "SV-S3"
-    git --version
-
-    echo "SV-S4.1"
-    # Fetch full Git history if shallow
-    if [ -f .git/shallow ]; then
-        echo "Fetching full Git history..."
-        git fetch --unshallow
-    fi
-
-    echo "SV-S4.2"
-    # Get the total commits on the main branch
-    TotalMainCommits=$(git rev-list --count origin/main)
-    TargetPatchVersion=$((TotalMainCommits + 1))
-    echo "SV-S4.3"
-    # Log basic info
-    echo "Commit Branch --> $GITHUB_REF_NAME"
-    echo "Total Main Commits --> $TotalMainCommits"
-
-    # Determine the version suffix based on the branch type
-    case "$GITHUB_REF_NAME" in
-        main)
-            PATCH=$TargetPatchVersion
-            ;;
-        develop)
-            PATCH="$TargetPatchVersion-beta$GITHUB_RUN_NUMBER"
-            ;;
-        feature/*)
-            PATCH="$TargetPatchVersion-alpha$GITHUB_RUN_NUMBER"
-            ;;
-        bugfix/*)
-            PATCH="$TargetPatchVersion-preview$GITHUB_RUN_NUMBER"
-            ;;
-        hotfix/*)
-            PATCH="$TargetPatchVersion-hf$GITHUB_RUN_NUMBER"
-            ;;
-        release/*)
-            PATCH="$TargetPatchVersion-rc$GITHUB_RUN_NUMBER"
-            ;;
-        *)
-            PATCH="$TargetPatchVersion-unstable$GITHUB_RUN_NUMBER"
-            echo "Warning: Branch type not recognized. Using unstable version suffix."
-            ;;
-    esac
-
-    # Construct the semantic version
-    TargetVersion="$MAJOR.$MINOR.$PATCH"
-
-    # Export the version for further use in CI/CD pipelines
-    export TargetVersion
-
-    # Output the new semantic version
-    # shellcheck disable=SC3037
-    echo -e "\033[1m\033[0;34mSemantic Versioning\033[0m"
-    echo "----------------------------------------------"
-    echo "| VERSION       | $TargetVersion"
-    echo "----------------------------------------------"
-}
-
-# Function to Semantic Versioning
-SemanticVersioning() {
-
-    MAJOR=${1:-0}   # Default to 0 if not provided
-    MINOR=${2:-1}   # Default to 1 if not provided
-    PATCH=${3:-0}
-
-    # Ensure Git is installed
-    # shellcheck disable=SC3020
-    if ! command -v git &>/dev/null; then
-        apk add --no-cache git
-    fi
-
-    git --version
-
-    # Ensure full commit history is available
-    if [ -f .git/shallow ]; then
-        git fetch --unshallow
-    fi
-
-    # Get the total commits on the main branch
-    TotalMainCommits=$(git rev-list --count origin/main)
-    TargetPatchVersion=$((TotalMainCommits + 1))
-
-    log_info "Commit Branch --> $CI_COMMIT_BRANCH"
-    log_info "Total Main Commits --> $TotalMainCommits"
-
-    # # Feature branches increment minor versions
-    # # Use `cut` to extract the branch suffix
-    # BRANCH_SUFFIX=$(echo "$CI_COMMIT_BRANCH" | cut -d'/' -f2-)
-
-    # # Format the branch suffix (first 10 characters, lowercase, alphanumeric only)
-    # FORMATTED_SUFFIX=$(echo "$BRANCH_SUFFIX" | tr -cd '[:alnum:]' | cut -c1-10 | tr '[:upper:]' '[:lower:]')
-
-    # Adjust version based on branch type
-    case "$CI_COMMIT_BRANCH" in
-        main)
-            PATCH=$TargetPatchVersion
-            ;;
-        develop)
-            PATCH="$TargetPatchVersion-beta$CI_PIPELINE_IID"
-            ;;
-        feature/*)
-            PATCH="$TargetPatchVersion-alpha$CI_PIPELINE_IID"
-            ;;
-        bugfix/*)
-            PATCH="$TargetPatchVersion-preview$CI_PIPELINE_IID"
-            ;;
-        hotfix/*)
-            PATCH="$TargetPatchVersion-hf$CI_PIPELINE_IID"
-            ;;
-        release/*)
-            PATCH="$TargetPatchVersion-rc$CI_PIPELINE_IID"
-            ;;
-        *)
-            # Default case for unexpected branches
-            PATCH="$TargetPatchVersion-unstable$CI_PIPELINE_IID"
-            log_warning "Warning: Branch type not recognized."
-        ;;
-    esac
-
-    # Construct the semantic version
-    TargetVersion="$MAJOR.$MINOR.$PATCH"
-
-    export TargetVersion
-
-    # Output the new version
-    log_info "\033[1m\033[0;34mSemantic Versioning  \033[0m"
-    log_info "----------------------------------------------"
-    log_info "| VERSION       | $TargetVersion"
-    log_info "----------------------------------------------"
-}
-
-# Function to Patch Version Increment
-#update_patch_version() {
-#    # <major>.<minor>.<patch>
-#    local CURRENT_TAG="$1"
-#
-#    #Only works for stable version
-#    if [ "$CI_COMMIT_BRANCH" = "main" -o "$CI_COMMIT_BRANCH" = "master" ]; then
-#
-#        do_check_and_install_curl
-#
-#        CURRENT_PATCH="${CURRENT_TAG##*.}"
-#
-#        # Update the GitLab variable using the GitLab API
-#        curl -s --request PUT "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/CD_RELEASE_PATCH_VERSION" \
-#            --header "PRIVATE-TOKEN: $GITLAB_API_TOKEN" \
-#            --header "Content-Type: application/json" \
-#            --data "{\"value\": \"$CURRENT_PATCH\", \"protected\": false, \"masked\": false}" \
-#            && echo "✅ Successfully updated CD_RELEASE_PATCH_VERSION to $CURRENT_PATCH in project $CI_PROJECT_ID." || \
-#            echo "❌ Failed to update CD_RELEASE_PATCH_VERSION. Please check your configuration and permissions."
-#    else
-#        log_info "Branch is not 'main' or 'master'. Skipping patch increment."
-#    fi
-#}
-
 # Function to publish the Docker image to the registry
 PublishArtifacts() {
 
@@ -459,14 +289,15 @@ PublishArtifacts() {
     log_table_header "🔄 Pushing Docker image to the Github Container Registry..."
 
     # Set environment-specific variables
-    CI_REGISTRY_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
     CI_PIPELINE_IID="${GITHUB_RUN_NUMBER}"
+    CI_REGISTRY_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
 
     # Convert repository name to lowercase for Docker compatibility
-    CI_REGISTRY_IMAGE=$(echo "$CI_REGISTRY_IMAGE" | tr '[:upper:]' '[:lower:]')
-    CI_REGISTRY_PASSWORD="${GHP_TOKEN}"
     CI_REGISTRY_USER="${GITHUB_ACTOR}"
-    TargetVersion=0.1.8
+    CI_REGISTRY_PASSWORD="${GHP_TOKEN}"
+    TargetVersion="${GHP_STV}"
+    CI_REGISTRY_IMAGE=$(echo "$CI_REGISTRY_IMAGE" | tr '[:upper:]' '[:lower:]')
+
 
     # Load the Docker image from the tar file
     IMAGE_TAR="$ARTIFACTS_DIR/pipeline-artifact-$CI_PIPELINE_IID.tar"
@@ -485,9 +316,9 @@ PublishArtifacts() {
         log_table_header "Artifactory Images"
         docker images
         draw_line
-        docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":$TargetVersion
+        docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"$TargetVersion"
         echo "$CI_REGISTRY_PASSWORD" | docker login ghcr.io -u "$CI_REGISTRY_USER" --password-stdin
-        if docker --debug push "$CI_REGISTRY_IMAGE":$TargetVersion; then
+        if docker --debug push "$CI_REGISTRY_IMAGE":"$TargetVersion"; then
             log_info "\033[1m\033[0;34mCI Publish Artifacts Log Summary \033[0m"
             log_info "------------------------------------------------------------------------------"
             log_info "| Artifact  Image     | $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID"
@@ -555,3 +386,63 @@ case $COMMAND in
         exit 1
         ;;
 esac
+
+#
+## Initialize variables
+#COMMAND=""
+#SemanticTargetVersion=""
+#
+## Parse arguments
+## shellcheck disable=SC3010
+#while [[ $# -gt 0 ]]; do
+#    case "$1" in
+#        --Target)
+#            COMMAND="$2"
+#            shift 2
+#            ;;
+#        --Version)
+#            SemanticTargetVersion="$2"
+#            shift 2
+#            ;;
+#        *)
+#            log_error "Unknown option: $1"
+#            log_error "Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace} [--Version <version> (required for Publish)]"
+#            exit 1
+#            ;;
+#    esac
+#done
+#
+## Validate the COMMAND
+## shellcheck disable=SC3010
+#if [[ -z "$COMMAND" ]]; then
+#    log_error "No command specified. Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace} [--Version <version> (required for Publish)]"
+#    exit 1
+#fi
+#
+## Validate the Version for Publish
+## shellcheck disable=SC3010
+#if [[ "$COMMAND" == "Publish" && -z "$VERSION" ]]; then
+#    log_error "No version specified for Publish. Usage: $0 --Target Publish --Version <version>"
+#    exit 1
+#fi
+#
+## Command Dispatcher
+#case $COMMAND in
+#    Build)
+#        Bootstrap
+#        BuildAndPackage
+#        ;;
+#    Scan)
+#        ContainerImageScan
+#        ;;
+#    Publish)
+#        PublishArtifacts
+#        ;;
+#    CleanWorkspace)
+#        CleanWorkspace
+#        ;;
+#    *)
+#        log_error "Invalid command: $COMMAND. Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace}"
+#        exit 1
+#        ;;
+#esac
