@@ -22,9 +22,8 @@ jobs:
         id: version_step
         uses: gittools/actions/gitversion/execute@v1.1.1
         with:
-          targetPath: "$(System.DefaultWorkingDirectory)/myProjectA"
-          useConfigFile: true
-          configFilePath: "myProjectA/GitVersion.yml"
+         useConfigFile: true
+         configFilePath: GitVersion.yml
 
 #  Versioning:
 #    name: Versioning
