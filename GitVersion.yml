@@ -1,5 +1,5 @@
 assembly-versioning-scheme: Major
-mode: Mainline
+mode: ContinuousDeployment
 increment: Inherit
 branches: {}
 ignore:
