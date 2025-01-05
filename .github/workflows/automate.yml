@@ -27,7 +27,6 @@ jobs:
   Publish-Stable-Branch-Artifacts:
     name: Publish Stable Branch Artifacts
     runs-on: ubuntu-latest
-    container: docker:20.10.7
     needs:
       - Build-and-Package
 #    if: github.ref == 'refs/heads/main'
@@ -55,6 +54,7 @@ jobs:
           name: Build-Runner-Artifacts
           path: ./Build-Runner-Artifacts/
       - name: Publish
+        container: docker:20.10.7
         env:
           GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
         run: |
