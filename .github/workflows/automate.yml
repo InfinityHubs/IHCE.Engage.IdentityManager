@@ -38,6 +38,10 @@ jobs:
         with:
           fetch-depth: 0  # Ensure full history is fetched, useful for Git operations during publish.
 
+      - name: Install .NET SDK
+        run: |
+          curl -sSL https://aka.ms/install-dotnet.sh | bash -s -- --channel 6.0
+
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.10.1
         with:
