@@ -1,15 +1,22 @@
-mode: ContinuousDeployment
-next-version: 1.0.0
-branches:
-  main:
-    tag: ""
-    increment: Patch
-    prevent-increment-of-merged-branch-version: true
-    is-mainline: true
-  develop:
-    tag: "beta"
-    increment: Minor
-    track-merge-target: true
+assembly-versioning-scheme: Major
+mode: Mainline
+branches: {}
+ignore:
+  sha: []
+
+#
+#mode: ContinuousDeployment
+#next-version: 1.0.0
+#branches:
+#  main:
+#    tag: ""
+#    increment: Patch
+#    prevent-increment-of-merged-branch-version: true
+#    is-mainline: true
+#  develop:
+#    tag: "beta"
+#    increment: Minor
+#    track-merge-target: true
 #  feature:
 #    tag: "{BranchName}"
 #    increment: Inherit
