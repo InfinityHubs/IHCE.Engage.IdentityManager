@@ -7,41 +7,20 @@ on:
       - '*'
 
 jobs:
-  Build-and-Package:
-    name: Build and Package
+  Versioning:
+    name: Versioning
     runs-on: ubuntu-latest
-    container: docker:20.10.7
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.head_ref }}   # Checkout the correct branch name
-          fetch-depth: 0  # Ensure full history is fetched, useful for Git operations during publish.
-      - name: Build
-        run: sh ./automate.sh --Target Build
-      - name: Save Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: Build-Runner-Artifacts
-          path: Build-Runner-Artifacts/
-
-  Publish-Stable-Branch-Artifacts:
-    name: Publish Stable Branch Artifacts
-    runs-on: ubuntu-latest
-    container: docker:20.10.7
-    needs:
-      - Build-and-Package
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-        with:
+          ref: ${{ github.head_ref }}  # Checkout the correct branch name
           fetch-depth: 0  # Ensure full history is fetched, useful for Git operations during publish.
 
       - name: Install dependencies (curl, bash, .NET SDK)
         run: |
-          apt-get update
-          apt-get install -y curl bash
+          sudo apt-get update
+          sudo apt-get install -y curl bash
           curl -sSL https://aka.ms/install-dotnet.sh | bash -s -- --channel 6.0
 
       - name: Install GitVersion
@@ -56,24 +35,87 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "GitVersion calculated: $VERSION"
 
-      - name: Display Version
-        run: |
-          echo "Using version from GitVersion:"
-          echo "Version: ${{ env.VERSION }}"
+      - name: Save Version as Artifact
+        run: echo "${{ env.VERSION }}" > version.txt
 
-      - name: Download Artifacts
-        uses: actions/download-artifact@v3
+      - name: Upload Version Artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: Build-Runner-Artifacts
-          path: ./Build-Runner-Artifacts/
+          name: version-artifact
+          path: version.txt
 
-      - name: Publish
-        env:
-          GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
-          VERSION: ${{ env.VERSION }}
-        run: |
-          echo "Publishing version: $VERSION"
-          sh ./automate.sh --Target Publish --Version $VERSION
+#  Build-and-Package:
+#    name: Build and Package
+#    runs-on: ubuntu-latest
+#    container: docker:20.10.7
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v3
+#        with:
+#          ref: ${{ github.head_ref }}   # Checkout the correct branch name
+#          fetch-depth: 0  # Ensure full history is fetched, useful for Git operations during publish.
+#      - name: Build
+#        run: sh ./automate.sh --Target Build
+#      - name: Save Artifacts
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: Build-Runner-Artifacts
+#          path: Build-Runner-Artifacts/
+#
+#  Publish-Stable-Branch-Artifacts:
+#    name: Publish Stable Branch Artifacts
+#    runs-on: ubuntu-latest
+#    container: docker:20.10.7
+#    needs:
+#      - Build-and-Package
+#    if: github.ref == 'refs/heads/main'
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 0  # Ensure full history is fetched, useful for Git operations during publish.
+#
+#      - name: Install dependencies (curl, bash, .NET SDK)
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y curl bash
+#          curl -sSL https://aka.ms/install-dotnet.sh | bash -s -- --channel 6.0
+#
+#      - name: Install GitVersion
+#        uses: gittools/actions/gitversion/setup@v0.10.1
+#        with:
+#          versionSpec: '5.x'
+#
+#      - name: Run GitVersion
+#        id: gitversion
+#        run: |
+#          VERSION=$(gitversion /showvariable SemVer)
+#          echo "VERSION=$VERSION" >> $GITHUB_ENV
+#          echo "GitVersion calculated: $VERSION"
+#
+#      - name: Display Version
+#        run: |
+#          echo "Using version from GitVersion:"
+#          echo "Version: ${{ env.VERSION }}"
+#
+#      - name: Download Artifacts
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: Build-Runner-Artifacts
+#          path: ./Build-Runner-Artifacts/
+#
+#      - name: Publish
+#        env:
+#          GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
+#          VERSION: ${{ env.VERSION }}
+#        run: |
+#          echo "Publishing version: $VERSION"
+#          sh ./automate.sh --Target Publish --Version $VERSION
+#
+
+
+
+
 
 #
 #  Container-Image-Scan:
