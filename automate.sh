@@ -429,28 +429,28 @@ SemanticVersioning() {
 }
 
 # Function to Patch Version Increment
-update_patch_version() {
-    # <major>.<minor>.<patch>
-    local CURRENT_TAG="$1"
-
-    #Only works for stable version
-    if [ "$CI_COMMIT_BRANCH" = "main" -o "$CI_COMMIT_BRANCH" = "master" ]; then
-
-        do_check_and_install_curl
-
-        CURRENT_PATCH="${CURRENT_TAG##*.}"
-
-        # Update the GitLab variable using the GitLab API
-        curl -s --request PUT "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/CD_RELEASE_PATCH_VERSION" \
-            --header "PRIVATE-TOKEN: $GITLAB_API_TOKEN" \
-            --header "Content-Type: application/json" \
-            --data "{\"value\": \"$CURRENT_PATCH\", \"protected\": false, \"masked\": false}" \
-            && echo "✅ Successfully updated CD_RELEASE_PATCH_VERSION to $CURRENT_PATCH in project $CI_PROJECT_ID." || \
-            echo "❌ Failed to update CD_RELEASE_PATCH_VERSION. Please check your configuration and permissions."
-    else
-        log_info "Branch is not 'main' or 'master'. Skipping patch increment."
-    fi
-}
+#update_patch_version() {
+#    # <major>.<minor>.<patch>
+#    local CURRENT_TAG="$1"
+#
+#    #Only works for stable version
+#    if [ "$CI_COMMIT_BRANCH" = "main" -o "$CI_COMMIT_BRANCH" = "master" ]; then
+#
+#        do_check_and_install_curl
+#
+#        CURRENT_PATCH="${CURRENT_TAG##*.}"
+#
+#        # Update the GitLab variable using the GitLab API
+#        curl -s --request PUT "$CI_API_V4_URL/projects/$CI_PROJECT_ID/variables/CD_RELEASE_PATCH_VERSION" \
+#            --header "PRIVATE-TOKEN: $GITLAB_API_TOKEN" \
+#            --header "Content-Type: application/json" \
+#            --data "{\"value\": \"$CURRENT_PATCH\", \"protected\": false, \"masked\": false}" \
+#            && echo "✅ Successfully updated CD_RELEASE_PATCH_VERSION to $CURRENT_PATCH in project $CI_PROJECT_ID." || \
+#            echo "❌ Failed to update CD_RELEASE_PATCH_VERSION. Please check your configuration and permissions."
+#    else
+#        log_info "Branch is not 'main' or 'master'. Skipping patch increment."
+#    fi
+#}
 
 # Function to publish the Docker image to the registry
 PublishArtifacts() {
