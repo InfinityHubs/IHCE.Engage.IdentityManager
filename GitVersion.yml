@@ -1,6 +1,4 @@
-assembly-versioning-scheme: Major
 mode: ContinuousDeployment
-increment: Inherit
 branches: {}
 ignore:
   sha: []
