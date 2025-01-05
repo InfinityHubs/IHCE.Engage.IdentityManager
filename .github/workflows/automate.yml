@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Automate Pipeline
 
 on:
   push:
@@ -12,20 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     container: docker:20.10.7
     steps:
-      - name: Install Git
-        run: apk add --no-cache git
-      - name: Install Bash
-        run: apk add --no-cache bash
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref }}   # checkout the correct branch name
           fetch-depth: 0 # Ensure full history is fetched, useful for Git operations during publish.
-      - name: Version-Tool
-        uses: HydrolienF/Version-Tool@0.5.5
-        id: version
-      - name: print
-        run: echo ${{ steps.version.outputs.version }}
       - name: Build
         run: sh ./automate.sh --Target Build
       - name: Save Artifacts

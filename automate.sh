@@ -75,7 +75,7 @@ draw_line() { echo -e  "\033[0;34m$1\033[0m"; }
 
 # Function to print the table header (Centralized and bolded)
 log_table_header() {
-    local header_message=$1  # Take the message as an argument
+    local header_message="$1"  # Take the message as an argument
     log_info "\033[1m\033[0;34m $header_message \033[0m"
     log_info "------------------------------------------------------------------------------"
 }
@@ -112,7 +112,7 @@ Bootstrap() {
 
     # Initialize a counter to help avoid the trailing `|` in the last row
     counter=0
-    total_vars=$(echo $REQUIRED_VARS | wc -w)
+    total_vars=$(echo "$REQUIRED_VARS" | wc -w)
 
     # Print table header
     log_table_header "CI/CD Global Pipeline Variables"
@@ -177,7 +177,7 @@ BuildAndPackage() {
 
     # Build Docker image
     log_info "🚀🔨 \033[1mHold tight! Docker build initiated.......\033[0m 🔨🚀\n\n"
-    if docker build --pull --no-cache -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID .; then
+    if docker build --pull --no-cache -t "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" .; then
         log_info "\033[1m\033[0;34m CI Docker image built successfully \033[0m"
         log_info "------------------------------------------------------------------------------"
         log_info "| Container Registry Image | $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID"
@@ -197,7 +197,7 @@ BuildAndPackage() {
     # Validate if the image exists
     if docker inspect "$CI_REGISTRY_IMAGE:$CI_PIPELINE_IID" > /dev/null 2>&1; then
         log_success "✅ [SUCCESS] Image $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID exists."
-        docker save $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID > $ARTIFACTS_DIR/pipeline-artifact-$CI_PIPELINE_IID.tar
+        docker save "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" > $ARTIFACTS_DIR/pipeline-artifact-"$CI_PIPELINE_IID".tar
         # docker create --name temp_container "$CI_REGISTRY_IMAGE:$CI_PIPELINE_IID"
         # # docker export temp_container | tar -tv | sort -u
         # docker export temp_container > $ARTIFACTS_DIR/automate-ci-builder-temp-container.tar
@@ -485,9 +485,9 @@ PublishArtifacts() {
         log_table_header "Artifactory Images"
         docker images
         draw_line
-        docker tag $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID $CI_REGISTRY_IMAGE:$TargetVersion
-        echo $CI_REGISTRY_PASSWORD | docker login ghcr.io -u $CI_REGISTRY_USER --password-stdin
-        if docker --debug push $CI_REGISTRY_IMAGE:$TargetVersion; then
+        docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":$TargetVersion
+        echo "$CI_REGISTRY_PASSWORD" | docker login ghcr.io -u "$CI_REGISTRY_USER" --password-stdin
+        if docker --debug push "$CI_REGISTRY_IMAGE":$TargetVersion; then
             log_info "\033[1m\033[0;34mCI Publish Artifacts Log Summary \033[0m"
             log_info "------------------------------------------------------------------------------"
             log_info "| Artifact  Image     | $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID"
@@ -511,6 +511,7 @@ CleanWorkspace() {
 
 # Parse the command-line arguments
 COMMAND=""
+# shellcheck disable=SC3010
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --Target)
@@ -526,6 +527,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Validate if the COMMAND is provided
+# shellcheck disable=SC3010
 if [[ -z "$COMMAND" ]]; then
     log_error "No command specified. Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace}"
     exit 1
@@ -534,9 +536,9 @@ fi
 # Command Dispatcher
 case $COMMAND in
     Build)
-        SemanticVersioning1
-#        Bootstrap
-#        BuildAndPackage
+#        SemanticVersioning1
+        Bootstrap
+        BuildAndPackage
         ;;
     Scan)
         ContainerImageScan
