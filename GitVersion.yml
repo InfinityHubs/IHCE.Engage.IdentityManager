@@ -1,8 +1,9 @@
+---
 mode: ContinuousDeployment
 next-version: 1.0.0
 branches:
   main:
-    tag: ''
+    tag: ""
     increment: Patch
     prevent-increment-of-merged-branch-version: true
     is-mainline: true
@@ -11,21 +12,21 @@ branches:
     increment: Minor
     track-merge-target: true
   feature:
-    tag: '{BranchName}'
+    tag: "{BranchName}"
     increment: Inherit
     pre-release-weight: 3000
     source-branches:
       - develop
       - main
   hotfix:
-    tag: '{BranchName}'
+    tag: "{BranchName}"
     increment: Patch
     pre-release-weight: 100
     source-branches:
       - main
       - release
   bugfix:
-    tag: '{BranchName}'
+    tag: "{BranchName}"
     increment: Patch
     pre-release-weight: 200
     source-branches:
@@ -38,22 +39,17 @@ branches:
   support:
     tag: support
     increment: None
-  '*':
-    tag: '{BranchName}'
+  "*":
+    tag: "{BranchName}"
     increment: Inherit
     pre-release-weight: 4000
     source-branches:
       - develop
       - main
-
 ignore:
   sha: []
-merge-message-formats:
-  - "Merge branch '{branch}'"
-  - "Merge pull request #{id} from {branch}"
-
 branch-name-config:
   replace:
-    regex: '^(feature/|hotfix/|bugfix/|release/|support/|development/)'
-    with: ''
-  separator: '-'
+    regex: ^(feature/|hotfix/|bugfix/|release/|support/|development/)
+    with: ""
+  separator: "-"
