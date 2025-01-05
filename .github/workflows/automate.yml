@@ -22,47 +22,49 @@ jobs:
         id: version_step
         uses: gittools/actions/gitversion/execute@v1.1.1
         with:
-          useConfigFile: true
-  Versioning:
-    name: Versioning
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref }}  # Checkout the correct branch name
-          fetch-depth: 0  # Ensure full history is fetched, useful for Git operations during publish.
+         useConfigFile: true
+         configFilePath: GitVersion.yml
 
-      - name: Install dependencies (curl, bash, .NET SDK)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y curl bash
-          curl -sSL https://dotnet.microsoft.com/download/dotnet/6.0 | grep -o 'https://.*install.*sh' | head -n 1 | xargs curl -sSL | bash
-
-      - name: Install GitVersion (via dotnet tool)
-        run: |
-          dotnet tool install --global GitVersion.Tool
-          echo "::add-path::$(dotnet tool list --global | grep GitVersion | awk '{print $3}')"
-
-      - name: Verify GitVersion installation
-        run: |
-          gitversion --version
-
-      - name: Run GitVersion
-        id: gitversion
-        run: |
-          VERSION=$(gitversion /showvariable SemVer)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "GitVersion calculated: $VERSION"
-
-      - name: Save Version as Artifact
-        run: echo "${{ env.VERSION }}" > version.txt
-
-      - name: Upload Version Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: version-artifact
-          path: version.txt
+#  Versioning:
+#    name: Versioning
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v3
+#        with:
+#          ref: ${{ github.head_ref }}  # Checkout the correct branch name
+#          fetch-depth: 0  # Ensure full history is fetched, useful for Git operations during publish.
+#
+#      - name: Install dependencies (curl, bash, .NET SDK)
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y curl bash
+#          curl -sSL https://dotnet.microsoft.com/download/dotnet/6.0 | grep -o 'https://.*install.*sh' | head -n 1 | xargs curl -sSL | bash
+#
+#      - name: Install GitVersion (via dotnet tool)
+#        run: |
+#          dotnet tool install --global GitVersion.Tool
+#          echo "::add-path::$(dotnet tool list --global | grep GitVersion | awk '{print $3}')"
+#
+#      - name: Verify GitVersion installation
+#        run: |
+#          gitversion --version
+#
+#      - name: Run GitVersion
+#        id: gitversion
+#        run: |
+#          VERSION=$(gitversion /showvariable SemVer)
+#          echo "VERSION=$VERSION" >> $GITHUB_ENV
+#          echo "GitVersion calculated: $VERSION"
+#
+#      - name: Save Version as Artifact
+#        run: echo "${{ env.VERSION }}" > version.txt
+#
+#      - name: Upload Version Artifact
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: version-artifact
+#          path: version.txt
 
 
 
