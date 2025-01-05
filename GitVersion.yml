@@ -4,15 +4,12 @@ branches:
   main:
     tag: ""
     increment: Patch
-    prevent-increment-of-merged-branch-version: false
+    prevent-increment-of-merged-branch-version: true
     is-mainline: true
-  other-branches:
-    tag: "ci"
-
-#  develop:
-#    tag: beta
-#    increment: Minor
-#    track-merge-target: true
+  develop:
+    tag: "beta"
+    increment: Minor
+    track-merge-target: true
 #  feature:
 #    tag: "{BranchName}"
 #    increment: Inherit
