@@ -38,8 +38,10 @@ jobs:
         with:
           fetch-depth: 0  # Ensure full history is fetched, useful for Git operations during publish.
 
-      - name: Install .NET SDK
+      - name: Install dependencies (curl, bash, .NET SDK)
         run: |
+          sudo apt-get update
+          sudo apt-get install -y curl bash
           curl -sSL https://aka.ms/install-dotnet.sh | bash -s -- --channel 6.0
 
       - name: Install GitVersion
