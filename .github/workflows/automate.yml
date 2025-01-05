@@ -23,10 +23,13 @@ jobs:
           sudo apt-get install -y curl bash
           curl -sSL https://dotnet.microsoft.com/download/dotnet/6.0 | grep -o 'https://.*install.*sh' | head -n 1 | xargs curl -sSL | bash
 
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.10.1
-        with:
-          versionSpec: '5.x'
+      - name: Install GitVersion (via dotnet tool)
+        run: |
+          dotnet tool install --global GitVersion.Tool
+
+      - name: Verify GitVersion installation
+        run: |
+          gitversion --version
 
       - name: Run GitVersion
         id: gitversion
@@ -43,6 +46,7 @@ jobs:
         with:
           name: version-artifact
           path: version.txt
+
 
 #  Build-and-Package:
 #    name: Build and Package
