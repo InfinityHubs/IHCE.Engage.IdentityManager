@@ -24,6 +24,11 @@ jobs:
         with:
           name: Build-Runner-Artifacts
           path: Build-Runner-Artifacts/
+      - name: Generate Version
+        uses: HydrolienF/Version-Tool@0.5.5
+        id: version
+      - name: Set Output Version
+        run: echo "VERSION=${{ steps.version.outputs.version }}" >> $GITHUB_ENV
 
   Create-Release:
     name: Create Release
