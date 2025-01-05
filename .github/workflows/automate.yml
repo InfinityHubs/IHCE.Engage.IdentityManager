@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - '*'
+      - '*' # Matches all branches
 
 jobs:
   create_version:
@@ -14,16 +14,30 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.1.1
         with:
           versionSpec: '5.x'
+
       - name: Determine Version
         id: version_step
         uses: gittools/actions/gitversion/execute@v3.1.1
         with:
-         useConfigFile: true
-         configFilePath: GitVersion.yml
+          useConfigFile: true
+          configFilePath: GitVersion.yml
+
+      - name: Output FullSemVer
+        run: |
+          echo "FullSemVer: ${{ steps.version_step.outputs.FullSemVer }}"
+
+      - name: Use FullSemVer in a Step
+        run: |
+          echo "Version: ${{ steps.version_step.outputs.FullSemVer }}"
+          # You can pass this version as an environment variable
+        env:
+          VERSION: ${{ steps.version_step.outputs.FullSemVer }}
+
 
 #  Versioning:
 #    name: Versioning
