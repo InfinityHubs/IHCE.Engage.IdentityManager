@@ -19,7 +19,8 @@ jobs:
 
       - name: Install dependencies (curl, bash, .NET SDK)
         run: |
-          sudo apk add --no-cache curl bash
+          sudo apt-get update
+          sudo apt-get install -y curl bash
           curl -sSL https://dotnet.microsoft.com/download/dotnet/6.0 | grep -o 'https://.*install.*sh' | head -n 1 | xargs curl -sSL | bash
 
       - name: Install GitVersion
