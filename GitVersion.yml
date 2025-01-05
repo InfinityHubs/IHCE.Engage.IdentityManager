@@ -1,5 +1,15 @@
 assembly-versioning-scheme: Major
 mode: Mainline
-branches: {}
+branches:
+  main:
+    versioning-mode: Major
+    increment: Minor
+    tag: ''
+  develop:
+    versioning-mode: ContinuousDelivery
+    increment: Patch
+    pre-release-weight: 500
+    tag: alpha
 ignore:
   sha: []
+
