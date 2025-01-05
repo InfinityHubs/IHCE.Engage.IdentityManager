@@ -26,6 +26,7 @@ jobs:
       - name: Install GitVersion (via dotnet tool)
         run: |
           dotnet tool install --global GitVersion.Tool
+          echo "::add-path::$(dotnet tool list --global | grep GitVersion | awk '{print $3}')"
 
       - name: Verify GitVersion installation
         run: |
@@ -46,6 +47,7 @@ jobs:
         with:
           name: version-artifact
           path: version.txt
+
 
 
 #  Build-and-Package:
