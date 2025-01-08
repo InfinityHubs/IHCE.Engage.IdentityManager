@@ -367,7 +367,6 @@ fi
 # Command Dispatcher
 case $COMMAND in
     Build)
-#        SemanticVersioning1
         Bootstrap
         BuildAndPackage
         ;;
@@ -375,7 +374,6 @@ case $COMMAND in
         ContainerImageScan
         ;;
     Publish)
-#        SemanticVersioning
         PublishArtifacts
         ;;
     CleanWorkspace)

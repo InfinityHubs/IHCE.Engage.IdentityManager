@@ -1,0 +1,265 @@
+name: IHCE.SaasOps.Automate.Builder
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/*'
+      - 'release/*'
+      - 'hotfix/*'
+  pull_request: null
+  workflow_dispatch: null
+
+env:
+  _Variables: ${{ toJson(vars) }}
+  _Secrets: ${{ toJson(secrets) }}
+
+jobs:
+  Build-Build-and-Package:
+    name: Build-Build-and-Package
+    runs-on: ubuntu-latest
+    container: docker:20.10.7
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          clean: true
+      - name: Run Automate Script
+        run: sh ./automate.sh --Target Build
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build-Runner-Artifacts
+          path: Build-Runner-Artifacts/
+          if-no-files-found: ignore
+
+  Build-VCS-Verbosity-Diagnostic:
+    name: Build-VCS-Verbosity-Diagnostic
+    runs-on: ubuntu-latest
+    needs:
+      - Build-Build-and-Package
+    outputs:
+      semantic_version: ${{ steps.version_step.outputs.FullSemVer }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          clean: true
+      - name: Setup Semantic GitVersion
+        uses: gittools/actions/gitversion/setup@v3.1.1
+        with:
+          versionSpec: '5.x'
+          preferLatestVersion: true
+      - name: Execute Semantic GitVersion
+        id: version_step
+        uses: gittools/actions/gitversion/execute@v3.1.1
+        with:
+          useConfigFile: true
+          configFilePath: GitVersion.yml
+      - name: Output FullSemVer
+        run: |
+          echo "TargetVersion: ${{ steps.version_step.outputs.FullSemVer }}"
+#
+#  Build-Build-and-Package:
+#    name: Build-Build-and-Package
+#    runs-on: ubuntu-latest
+#    container: docker:20.10.7
+#    needs:
+#      - Build-VCS-Verbosity-Diagnostic
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#          clean: true
+#      - name: Run Automate Script
+#        run: sh ./automate.sh --Target Build
+#      - name: Upload Artifacts
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: Build-Runner-Artifacts
+#          path: Build-Runner-Artifacts/
+#
+#
+#
+#
+#
+#  Build-Build-and-Package2:
+#    steps:
+#      - name: Checkout Git VCS
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#          clean: true
+#      - name: Setup Semantic GitVersion
+#        uses: gittools/actions/gitversion/setup@v3.1.1
+#        with:
+#          versionSpec: '5.x'
+#          preferLatestVersion: true
+#      - name: Execute Semantic GitVersion
+#        id: version_step
+#        uses: gittools/actions/gitversion/execute@v3.1.1
+#        with:
+#          useConfigFile: true
+#          configFilePath: GitVersion.yml
+#      - run: pwsh bootstrap.ps1 -Verbosity Diagnostic
+#      - uses: actions/upload-artifact@v4.1.0
+#        with:
+#          name: consup-gatewaymanagement.reverseproxy_Packages
+#          path: BuildArtifacts
+#          if-no-files-found: ignore
+#    runs-on:
+#      group: hce-enterprise
+#      labels: [hce, Linux, self-hosted]
+#
+#  Build-Run-OSS-Scan:
+#    steps:
+#      - uses: actions/checkout@v4.1.0
+#        with:
+#          fetch-depth: 0
+#          clean: true
+#      - run: pwsh bootstrap.ps1 -Target OpenSourceSoftwareScan -Verbosity Diagnostic
+#    runs-on:
+#      group: hce-enterprise
+#      labels: [hce, Linux, self-hosted]
+#    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/hotfix/')
+#
+#  Build-Run-Quality-Tools:
+#    steps:
+#      - uses: actions/checkout@v4.1.0
+#        with:
+#          fetch-depth: 0
+#          clean: true
+#      - run: pwsh bootstrap.ps1 -Target Quality
+#      - uses: actions/upload-artifact@v4.1.0
+#        with:
+#          name: consup-gatewaymanagement.reverseproxy_Coverage_Artifacts
+#          path: BuildArtifacts
+#          if-no-files-found: ignore
+#
+#on:
+#  push:
+#    branches:
+#      - main
+#      - develop
+#      - 'feature/*'
+#      - 'release/*'
+#      - 'hotfix/*'
+#  pull_request: null
+#
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      # Checkout repository with full history
+#      - name: Checkout Code
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0  # Ensure full history is fetched.
+#          clean: true
+#
+#      # Install GitVersion
+#      - name: Install GitVersion
+#        uses: gittools/actions/gitversion/setup@v3.1.1
+#        with:
+#          versionSpec: '5.12.0'
+#          preferLatestVersion: true
+#
+#      # Run GitVersion to determine version
+#      - name: Determine Version
+#        id: version_step
+#        uses: gittools/actions/gitversion/execute@v3.1.1
+#        with:
+#          useConfigFile: true
+#          configFilePath: GitVersion.yml  # Path to your GitVersion configuration file.
+#
+#      # Output GitVersion variables
+#      - name: Display Version Information
+#        run: |
+#          echo "FullSemVer: ${{ steps.version_step.outputs.fullsemver }}"
+#          echo "Major: ${{ steps.version_step.outputs.major }}"
+#          echo "Minor: ${{ steps.version_step.outputs.minor }}"
+#          echo "Patch: ${{ steps.version_step.outputs.patch }}"
+#
+#
+#
+#name: Automate Pipeline
+#
+#on:
+#  push:
+#    branches:
+#      - main
+#      - '*' # Matches all branches
+#jobs:
+#  Build-and-Package:
+#    name: Build and Package
+#    runs-on: ubuntu-latest
+#    container: docker:20.10.7
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v4
+#        with:
+#          ref: ${{ github.head_ref }}   # Checkout the correct branch name
+#          fetch-depth: 0  # Ensure full history is fetched, useful for Git operations during publish.
+#      - name: Build
+#        run: sh ./automate.sh --Target Build
+#      - name: Save Artifacts
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: Build-Runner-Artifacts
+#          path: Build-Runner-Artifacts/
+#
+#  Generate-Semantic-Version:
+#    name: Generate Semantic Version
+#    runs-on: ubuntu-latest
+#    needs:
+#      - Build-and-Package
+#    outputs:
+#      semantic_version: ${{ steps.version_step.outputs.FullSemVer }}
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0  # Ensure full history is fetched.
+#      - name: Install GitVersion
+#        uses: gittools/actions/gitversion/setup@v3.1.1
+#        with:
+#          versionSpec: '5.x'
+#      - name: Determine Version
+#        id: version_step
+#        uses: gittools/actions/gitversion/execute@v3.1.1
+#        with:
+#          useConfigFile: true
+#          configFilePath: GitVersion.yml
+#      - name: Output FullSemVer
+#        run: |
+#          echo "FullSemVer: ${{ steps.version_step.outputs.FullSemVer }}"
+#
+#  Publish-Stable-Branch-Artifacts:
+#    name: Publish Stable Branch Artifacts
+#    runs-on: ubuntu-latest
+#    container: docker:20.10.7
+#    needs:
+#      - Build-and-Package
+#      - Generate-Semantic-Version
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0  # Ensure full history is fetched.
+#      - name: Download Artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: Build-Runner-Artifacts
+#          path: ./Build-Runner-Artifacts/
+#      - name: Publish
+#        env:
+#          GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
+#          GHP_STV: ${{ needs.Generate-Semantic-Version.outputs.semantic_version }}
+#        run: |
+#          echo "TargetSemanticVersion: ${{ needs.Generate-Semantic-Version.outputs.semantic_version }}"
+#          sh ./automate.sh --Target Publish

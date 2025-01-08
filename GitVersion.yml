@@ -1,5 +1,29 @@
-assembly-versioning-scheme: Major
 mode: Mainline
-branches: {}
+commit-message-incrementing: MergeMessageOnly
+branches:
+  develop:
+    mode: ContinuousDelivery
+    tag: useBranchName
+    regex: (develop)[/-]
+    increment: None
+    source-branches: ['main']
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: true
+  feature:
+    regex: feature(s)?[/-]
+    mode: ContinuousDeployment
+    tag: useBranchName
+    increment: None
+    source-branches: ['main']
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+  hotfix:
+    regex: (hotfix(es)?|config)[/-]
+    mode: ContinuousDeployment
+    tag: useBranchName
+    increment: None
+    source-branches: ['main']
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
 ignore:
   sha: []
