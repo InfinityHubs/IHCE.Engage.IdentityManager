@@ -332,7 +332,8 @@ PublishArtifacts() {
         draw_line
         docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$TargetHub":"$TargetVersion"
         # echo "$CI_REGISTRY_PASSWORD" | docker login ghcr.io -u "$CI_REGISTRY_USER" --password-stdin
-        echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+#        echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+        echo "DjX-FWZh-CGftw7" | docker login -u "infinityhubs" --password-stdin
         if docker --debug push "$TargetHub":"$TargetVersion"; then
             log_info "\033[1m\033[0;34mCI Publish Artifacts Log Summary \033[0m"
             log_info "------------------------------------------------------------------------------"
