@@ -5,6 +5,7 @@ FROM python:3.11-slim
 WORKDIR /app/src
 
 # Copy the requirements file to the container
+COPY .trivyignore ./
 COPY src/requirements.txt .
 
 # Install the Python dependencies
