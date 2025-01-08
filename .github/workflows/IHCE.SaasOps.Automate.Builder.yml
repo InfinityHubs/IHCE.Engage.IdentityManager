@@ -38,6 +38,9 @@ jobs:
   Build-Build-Semantic-Version:
     name: Build-Build-Semantic-Version
     runs-on: ubuntu-latest
+    needs:
+      - Build-Build-and-Package
+      - Build-Run-Security-Scan
     outputs:
       semantic_version: ${{ steps.version_step.outputs.FullSemVer }}
     steps:
