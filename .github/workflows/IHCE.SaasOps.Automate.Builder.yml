@@ -82,8 +82,8 @@ jobs:
           sh ./automate.sh --Target Scan
     if: github.ref == 'refs/heads/main'
 
-  Publish-Publish-Artifacts-Stable-Branch:
-    name:  Publish-Publish-Artifacts-Stable-Branch
+  Publish-Publish-Stable-Artifacts:
+    name:  Publish-Publish-Stable-Artifacts
     runs-on: ubuntu-latest
     container: docker:20.10.7
     needs:
@@ -110,8 +110,8 @@ jobs:
           sh ./automate.sh --Target Publish
     if: github.ref == 'refs/heads/main'
 
-  Publish-Publish-Artifacts-Unstable-Branch:
-    name: Publish-Publish-Artifacts-Unstable-Branch
+  Publish-Publish-Unstable-Artifacts:
+    name: Publish-Publish-Unstable-Artifacts
     runs-on: ubuntu-latest
     container: docker:20.10.7
     needs:

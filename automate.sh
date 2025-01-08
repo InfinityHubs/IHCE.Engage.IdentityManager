@@ -282,13 +282,14 @@ ContainerImageScan() {
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v $(pwd):/project \
         aquasec/trivy:latest image \
-        --ignorefile /project/.trivyignore \
         --format table \
         --exit-code 0 \
         --scanners vuln,secret \
         --show-suppressed \
         --severity CRITICAL,HIGH,MEDIUM \
         "$IMAGE_NAME"
+
+    # --ignorefile /project/.trivyignore \
 
     draw_line  # Draw a separator
     echo "✅ Scan completed successfully"
