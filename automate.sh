@@ -309,12 +309,9 @@ PublishArtifacts() {
     CI_REGISTRY_USER="${GITHUB_ACTOR}"
     CI_REGISTRY_PASSWORD="${GHP_TOKEN}"
 
-    # Target Destinations
-    TargetHub=$(construct_target_hub)
+    # Convert Target Destinations repository name to lowercase for Docker compatibility
     TargetVersion="${GHP_TargetVersion}"
-
-    # Convert repository name to lowercase for Docker compatibility
-    CI_REGISTRY_IMAGE=$(echo "$CI_REGISTRY_IMAGE" | tr '[:upper:]' '[:lower:]')
+    TargetHub="docker.io/$(echo ${GITHUB_REPOSITORY} | tr '[:upper:]' '[:lower:]')"
 
     # Load the Docker image from the tar file
     IMAGE_TAR="$ARTIFACTS_DIR_CR_IMAGE-$CI_PIPELINE_IID.tar"
@@ -334,7 +331,8 @@ PublishArtifacts() {
         docker images
         draw_line
         docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$TargetHub":"$TargetVersion"
-        echo "$CI_REGISTRY_PASSWORD" | docker login ghcr.io -u "$CI_REGISTRY_USER" --password-stdin
+        # echo "$CI_REGISTRY_PASSWORD" | docker login ghcr.io -u "$CI_REGISTRY_USER" --password-stdin
+        echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
         if docker --debug push "$TargetHub":"$TargetVersion"; then
             log_info "\033[1m\033[0;34mCI Publish Artifacts Log Summary \033[0m"
             log_info "------------------------------------------------------------------------------"

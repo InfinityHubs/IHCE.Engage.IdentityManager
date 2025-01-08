@@ -103,6 +103,8 @@ jobs:
         env:
           GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
           GHP_TargetVersion: ${{ needs.Generate-Semantic-Version.outputs.semantic_version }}
+          DOCKERHUB_USERNAME: ${{ secrets.DH_IHCE_SAASOPS_AUTOMATE_ADMIN }}
+          $DOCKERHUB_PASSWORD: ${{ secrets.DH_IHCE_SAASOPS_AUTOMATE_READWRITE_ACCESSTOKEN }}
         run: |
           echo "Invoking Artifact Publishing"
           sh ./automate.sh --Target Publish
@@ -131,6 +133,8 @@ jobs:
         env:
           GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
           GHP_TargetVersion: ${{ needs.Generate-Semantic-Version.outputs.semantic_version }}
+          DOCKERHUB_USERNAME: ${{ secrets.DH_IHCE_SAASOPS_AUTOMATE_ADMIN }}
+          $DOCKERHUB_PASSWORD: ${{ secrets.DH_IHCE_SAASOPS_AUTOMATE_READWRITE_ACCESSTOKEN }}
         run: |
           echo "Invoking Artifact Publishing"
           sh ./automate.sh --Target Publish
