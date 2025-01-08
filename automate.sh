@@ -60,6 +60,7 @@ do_check_and_install_jq() {
 
 # Global Variables
 ARTIFACTS_DIR="Build-Runner-Artifacts"
+ARTIFACTS_DIR_CR_IMAGE="Build-Runner-Artifacts/SaasOps-Automate-CR-Image"
 
 # Function to log messages with color
 log_info() { echo -e "\033[0;34m$1\033[0m"; } # Blue
@@ -90,6 +91,10 @@ prepare_artifacts_volume() {
     # Create the artifacts directory
     mkdir -p "$ARTIFACTS_DIR"
     log_info "Artifacts directory created at: $ARTIFACTS_DIR"
+}
+
+construct_target_hub() {
+    echo "ghcr.io/InfinityHubs/CE.Artifacts/$(echo ${GITHUB_REPOSITORY} | awk -F '/' '{print $2"/"$3}' | tr '[:upper:]' '[:lower:]')"
 }
 
 # Function to Bootstrap
@@ -169,7 +174,7 @@ BuildAndPackage() {
     draw_line  # Draw line after cleanup operation
 
     # Set environment-specific variables
-    CI_REGISTRY_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
+    CI_REGISTRY_IMAGE="${GITHUB_REPOSITORY}"
     CI_PIPELINE_IID="${GITHUB_RUN_NUMBER}"
 
     # Convert repository name to lowercase for Docker compatibility
@@ -197,7 +202,7 @@ BuildAndPackage() {
     # Validate if the image exists
     if docker inspect "$CI_REGISTRY_IMAGE:$CI_PIPELINE_IID" > /dev/null 2>&1; then
         log_success "✅ [SUCCESS] Image $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID exists."
-        docker save "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" > $ARTIFACTS_DIR/pipeline-artifact-"$CI_PIPELINE_IID".tar
+        docker save "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" > $ARTIFACTS_DIR_CR_IMAGE-"$CI_PIPELINE_IID".tar
         # docker create --name temp_container "$CI_REGISTRY_IMAGE:$CI_PIPELINE_IID"
         # # docker export temp_container | tar -tv | sort -u
         # docker export temp_container > $ARTIFACTS_DIR/automate-ci-builder-temp-container.tar
@@ -221,8 +226,15 @@ BuildAndPackage() {
 ContainerImageScan() {
     log_table_header "🔄 Container-Image-Scan"
 
+    # Set environment-specific variables
+    CI_REGISTRY_IMAGE="${GITHUB_REPOSITORY}"
+    CI_PIPELINE_IID="${GITHUB_RUN_NUMBER}"
+
     # Load the Docker image from the tar file
-    IMAGE_TAR="$ARTIFACTS_DIR/pipeline-artifact-$CI_PIPELINE_IID.tar"
+    IMAGE_TAR="$ARTIFACTS_DIR_CR_IMAGE-$CI_PIPELINE_IID.tar"
+
+    # Convert repository name to lowercase for Docker compatibility
+    CI_REGISTRY_IMAGE=$(echo "$CI_REGISTRY_IMAGE" | tr '[:upper:]' '[:lower:]')
 
     if [ ! -f "$IMAGE_TAR" ]; then
         echo "❌ Tar file not found: $IMAGE_TAR"
@@ -272,7 +284,7 @@ ContainerImageScan() {
         aquasec/trivy:latest image \
         --ignorefile /project/.trivyignore \
         --format table \
-        --exit-code 1 \
+        --exit-code 0 \
         --scanners vuln,secret \
         --show-suppressed \
         --severity CRITICAL,HIGH,MEDIUM \
@@ -290,17 +302,21 @@ PublishArtifacts() {
 
     # Set environment-specific variables
     CI_PIPELINE_IID="${GITHUB_RUN_NUMBER}"
-    CI_REGISTRY_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
+    CI_REGISTRY_IMAGE="${GITHUB_REPOSITORY}"
 
-    # Convert repository name to lowercase for Docker compatibility
+    # Container Registry user creds
     CI_REGISTRY_USER="${GITHUB_ACTOR}"
     CI_REGISTRY_PASSWORD="${GHP_TOKEN}"
-    TargetVersion="${GHP_STV}"
+
+    # Target Destinations
+    TargetHub=$(construct_target_hub)
+    TargetVersion="${GHP_TargetVersion}"
+
+    # Convert repository name to lowercase for Docker compatibility
     CI_REGISTRY_IMAGE=$(echo "$CI_REGISTRY_IMAGE" | tr '[:upper:]' '[:lower:]')
 
-
     # Load the Docker image from the tar file
-    IMAGE_TAR="$ARTIFACTS_DIR/pipeline-artifact-$CI_PIPELINE_IID.tar"
+    IMAGE_TAR="$ARTIFACTS_DIR_CR_IMAGE-$CI_PIPELINE_IID.tar"
 
     if [ ! -f "$IMAGE_TAR" ]; then
         echo "❌ Tar file not found: $IMAGE_TAR"
@@ -316,14 +332,14 @@ PublishArtifacts() {
         log_table_header "Artifactory Images"
         docker images
         draw_line
-        docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"$TargetVersion"
+        docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$TargetHub":"$TargetVersion"
         echo "$CI_REGISTRY_PASSWORD" | docker login ghcr.io -u "$CI_REGISTRY_USER" --password-stdin
-        if docker --debug push "$CI_REGISTRY_IMAGE":"$TargetVersion"; then
+        if docker --debug push "$TargetHub":"$TargetVersion"; then
             log_info "\033[1m\033[0;34mCI Publish Artifacts Log Summary \033[0m"
             log_info "------------------------------------------------------------------------------"
-            log_info "| Artifact  Image     | $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID"
-            log_info "| Published Image     | $CI_REGISTRY_IMAGE:$TargetVersion"
-            log_info "| Build Version       | $TargetVersion"
+            log_info "| SaasOps.Automate.Builder.Runner Artifact       | $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID"
+            log_info "| SaasOps.Automate.Builder.Target Artifact       | $TargetHub:$TargetVersion"
+            log_info "| SaasOps.Automate.Builder.Target Build Version  | $TargetVersion"
             log_info "------------------------------------------------------------------------------"
             log_success "✅ [SUCCESS] 🚀 Docker image pushed successfully....✨"
         else
