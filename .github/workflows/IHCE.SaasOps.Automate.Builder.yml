@@ -64,7 +64,6 @@ jobs:
     container: docker:20.10.7
     needs:
       - Build-Build-and-Package
-      - Build-Build-Semantic-Version
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
