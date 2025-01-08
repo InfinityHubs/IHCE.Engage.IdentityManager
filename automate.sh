@@ -303,11 +303,11 @@ PublishArtifacts() {
 
     # Set environment-specific variables
     CI_PIPELINE_IID="${GITHUB_RUN_NUMBER}"
-    CI_REGISTRY_IMAGE="${GITHUB_REPOSITORY}"
+    CI_REGISTRY_IMAGE=$(echo ${GITHUB_REPOSITORY} | tr '[:upper:]' '[:lower:]')
 
     # Container Registry user creds
-    CI_REGISTRY_USER="${GITHUB_ACTOR}"
-    CI_REGISTRY_PASSWORD="${GHP_TOKEN}"
+    # CI_REGISTRY_USER="${GITHUB_ACTOR}"
+    # CI_REGISTRY_PASSWORD="${GHP_TOKEN}"
 
     # Convert Target Destinations repository name to lowercase for Docker compatibility
     TargetVersion="${GHP_TargetVersion}"
