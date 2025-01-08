@@ -87,7 +87,7 @@ jobs:
     needs:
       - Build-Build-and-Package
       - Build-Run-Security-Scan
-      - Build-Run-Diagnostic
+      - Build-Build-Semantic-Version
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -115,7 +115,7 @@ jobs:
     needs:
       - Build-Build-and-Package
       - Build-Run-Security-Scan
-      - Build-Run-Diagnostic
+      - Build-Build-Semantic-Version
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
