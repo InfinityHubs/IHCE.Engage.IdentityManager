@@ -16,7 +16,7 @@ class Configs(BaseSettings):
     PORT: int = 8000
 
     # Application instance configurations
-    NAMESPACE: str = "IHCE"
+    NAMESPACE: str = "IHCE.Engage"
     PIPELINE: str = "IdentityManagement.Service"
     PIPELINE_CODE: str = ""  # Assign this value as needed
     PROJECT_VERSION: str = "1.0.0"
