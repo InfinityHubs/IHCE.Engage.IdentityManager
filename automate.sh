@@ -94,7 +94,7 @@ prepare_artifacts_volume() {
 }
 
 construct_target_hub() {
-    echo "ghcr.io/InfinityHubs/CE.Artifacts/$(echo ${GITHUB_REPOSITORY} | awk -F '/' '{print $2"/"$3}' | tr '[:upper:]' '[:lower:]')"
+    echo "ghcr.io/infinityhubs/ce.artifacts/$(echo ${GITHUB_REPOSITORY} | awk -F '/' '{print $2}' | tr '[:upper:]' '[:lower:]')"
 }
 
 # Function to Bootstrap
