@@ -82,20 +82,21 @@ do_check_and_install_curl() {
 # ==================================================================================================================== #
 
 BuildAndPackage() {
-    local Context="https://raw.githubusercontent.com/InfinityHubs/IHCE.SaasOps.Automate.Builder/GitHub/Build.And.Package.sh"
-    local Builder="/tmp/build_and_package.sh"
-    ls -all
-    log_info "Fetching build script from GitHub.. ----"
-    do_check_and_install_curl
-    curl -sSL "$Context" -o "$Builder"
-
-    if [ -f "$Builder" ]; then
-        log_info "Sourcing the build script..."
-        . "$Builder"  # Using dot notation for sourcing
-        ls -all
+    if [ -f "/tmp/build_and_package.sh" ]; then
+        # If the build script exists, source it
+        . "/tmp/build_and_package.sh"
     else
-        log_error "Failed to fetch the build script. Check the URL and network connection."
-        exit 1
+        # If the build script doesn't exist, check and install curl if necessary
+        do_check_and_install_curl
+
+        # Fetch the build script using curl
+        curl -sSL "$IHCE_SAASOPS_AUTOMATE_BUILDER/Build.And.Package.sh" -o "/tmp/build_and_package.sh" && \
+
+        # Source the script after a successful fetch
+        . "/tmp/build_and_package.sh" || \
+
+        # If the fetch fails, log an error and exit
+        { log_error "Failed to fetch the build script. Please check the URL and network connection."; exit 1; }
     fi
 }
 
