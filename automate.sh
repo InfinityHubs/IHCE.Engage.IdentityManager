@@ -75,7 +75,7 @@ draw_line() { echo "------------------------------------------------------------
 BuildAndPackage() {
 #    local GITHUB_RAW_URL="https://raw.githubusercontent.com/InfinityHubs/IHCE.SaasOps.Automate.Builder/main/Build.And.Package.sh"
 #    local TEMP_SCRIPT="/tmp/build_and_package.sh"
-
+    ls -all
     log_info "Fetching build script from GitHub.. ----"
 #    curl -sSL "$GITHUB_RAW_URL" -o "$TEMP_SCRIPT"
 #
