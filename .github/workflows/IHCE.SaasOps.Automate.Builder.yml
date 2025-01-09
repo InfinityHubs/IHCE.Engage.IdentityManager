@@ -27,115 +27,116 @@ jobs:
           fetch-depth: 0
           clean: true
       - name: Run Automate Script
-        run: sh ./automate.sh --Target Build
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: Build-Runner-Artifacts
-          path: Build-Runner-Artifacts/
-          if-no-files-found: ignore
+        run: sh ./automate.sh --Target Build --Variables "${{ env._Variables }}" --Secrets "${{ env._Secrets }}"
 
-  Generate-Semantic-Version:
-    name: Generate-Semantic-Version
-    runs-on: ubuntu-latest
-    outputs:
-      semantic_version: ${{ steps.version_step.outputs.FullSemVer }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          clean: true
-      - name: Setup Semantic GitVersion
-        uses: gittools/actions/gitversion/setup@v3.1.1
-        with:
-          versionSpec: '5.x'
-          preferLatestVersion: true
-      - name: Execute Semantic GitVersion
-        id: version_step
-        uses: gittools/actions/gitversion/execute@v3.1.1
-        with:
-          useConfigFile: true
-          configFilePath: GitVersion.yml
+#      - name: Upload Artifacts
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: Build-Runner-Artifacts
+#          path: Build-Runner-Artifacts/
+#          if-no-files-found: ignore
 
-  Build-Run-Security-Scan:
-    name: Build-Run-Security-Scan
-    runs-on: ubuntu-latest
-    container: docker:20.10.7
-    needs:
-      - Build-Build-and-Package
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          clean: true
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: Build-Runner-Artifacts
-          path: ./Build-Runner-Artifacts/
-      - run: |
-          echo "Invoking Container Image Security Scanning"
-          sh ./automate.sh --Target Scan
-    if: github.ref == 'refs/heads/main'
-
-  Publish-Stable-Artifacts:
-    name:  Publish-Stable-Artifacts
-    runs-on: ubuntu-latest
-    container: docker:20.10.7
-    needs:
-      - Build-Build-and-Package
-      - Build-Run-Security-Scan
-      - Generate-Semantic-Version
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          clean: true
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: Build-Runner-Artifacts
-          path: ./Build-Runner-Artifacts/
-      - name: Publish
-        env:
-          GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
-          GHP_TargetVersion: ${{ needs.Generate-Semantic-Version.outputs.semantic_version }}
-          DOCKERHUB_USERNAME: ${{ secrets.DH_IHCE_SAASOPS_AUTOMATE_ADMIN }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DH_IHCE_SAASOPS_AUTOMATE_READWRITE_ACCESSTOKEN }}
-        run: |
-          echo "Invoking Artifact Publishing"
-          sh ./automate.sh --Target Publish
-    if: github.ref == 'refs/heads/main'
-
-  Publish-Unstable-Artifacts:
-    name: Publish-Unstable-Artifacts
-    runs-on: ubuntu-latest
-    container: docker:20.10.7
-    needs:
-      - Build-Build-and-Package
-      - Build-Run-Security-Scan
-      - Generate-Semantic-Version
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          clean: true
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: Build-Runner-Artifacts
-          path: ./Build-Runner-Artifacts/
-      - name: Publish
-        env:
-          GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
-          GHP_TargetVersion: ${{ needs.Generate-Semantic-Version.outputs.semantic_version }}
-          DOCKERHUB_USERNAME: ${{ secrets.DH_IHCE_SAASOPS_AUTOMATE_ADMIN }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DH_IHCE_SAASOPS_AUTOMATE_READWRITE_ACCESSTOKEN }}
-        run: |
-          echo "Invoking Artifact Publishing"
-          sh ./automate.sh --Target Publish
-    if: github.ref != 'refs/heads/main'
+#  Generate-Semantic-Version:
+#    name: Generate-Semantic-Version
+#    runs-on: ubuntu-latest
+#    outputs:
+#      semantic_version: ${{ steps.version_step.outputs.FullSemVer }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#          clean: true
+#      - name: Setup Semantic GitVersion
+#        uses: gittools/actions/gitversion/setup@v3.1.1
+#        with:
+#          versionSpec: '5.x'
+#          preferLatestVersion: true
+#      - name: Execute Semantic GitVersion
+#        id: version_step
+#        uses: gittools/actions/gitversion/execute@v3.1.1
+#        with:
+#          useConfigFile: true
+#          configFilePath: GitVersion.yml
+#
+#  Build-Run-Security-Scan:
+#    name: Build-Run-Security-Scan
+#    runs-on: ubuntu-latest
+#    container: docker:20.10.7
+#    needs:
+#      - Build-Build-and-Package
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#          clean: true
+#      - name: Download Artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: Build-Runner-Artifacts
+#          path: ./Build-Runner-Artifacts/
+#      - run: |
+#          echo "Invoking Container Image Security Scanning"
+#          sh ./automate.sh --Target Scan
+#    if: github.ref == 'refs/heads/main'
+#
+#  Publish-Stable-Artifacts:
+#    name:  Publish-Stable-Artifacts
+#    runs-on: ubuntu-latest
+#    container: docker:20.10.7
+#    needs:
+#      - Build-Build-and-Package
+#      - Build-Run-Security-Scan
+#      - Generate-Semantic-Version
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#          clean: true
+#      - name: Download Artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: Build-Runner-Artifacts
+#          path: ./Build-Runner-Artifacts/
+#      - name: Publish
+#        env:
+#          GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
+#          GHP_TargetVersion: ${{ needs.Generate-Semantic-Version.outputs.semantic_version }}
+#          DOCKERHUB_USERNAME: ${{ secrets.DH_IHCE_SAASOPS_AUTOMATE_ADMIN }}
+#          DOCKERHUB_PASSWORD: ${{ secrets.DH_IHCE_SAASOPS_AUTOMATE_READWRITE_ACCESSTOKEN }}
+#        run: |
+#          echo "Invoking Artifact Publishing"
+#          sh ./automate.sh --Target Publish
+#    if: github.ref == 'refs/heads/main'
+#
+#  Publish-Unstable-Artifacts:
+#    name: Publish-Unstable-Artifacts
+#    runs-on: ubuntu-latest
+#    container: docker:20.10.7
+#    needs:
+#      - Build-Build-and-Package
+#      - Build-Run-Security-Scan
+#      - Generate-Semantic-Version
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#          clean: true
+#      - name: Download Artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: Build-Runner-Artifacts
+#          path: ./Build-Runner-Artifacts/
+#      - name: Publish
+#        env:
+#          GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
+#          GHP_TargetVersion: ${{ needs.Generate-Semantic-Version.outputs.semantic_version }}
+#          DOCKERHUB_USERNAME: ${{ secrets.DH_IHCE_SAASOPS_AUTOMATE_ADMIN }}
+#          DOCKERHUB_PASSWORD: ${{ secrets.DH_IHCE_SAASOPS_AUTOMATE_READWRITE_ACCESSTOKEN }}
+#        run: |
+#          echo "Invoking Artifact Publishing"
+#          sh ./automate.sh --Target Publish
+#    if: github.ref != 'refs/heads/main'
