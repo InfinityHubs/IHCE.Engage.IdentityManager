@@ -14,7 +14,6 @@ on:
 env:
   _Variables: ${{ toJson(vars) }}
   _Secrets: ${{ toJson(secrets) }}
-  _DefaultVariables: ${{ toJson(github) }}
 
 jobs:
   Build-Build-and-Package:
