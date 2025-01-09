@@ -68,24 +68,35 @@ log_unknown() { log_message "$UNKNOWN" "$1"; }
 # Draw separator line
 draw_line() { echo "------------------------------------------------------------"; }
 
+# Function to check and install curl if not available
+do_check_and_install_curl() {
+    if ! command -v curl &> /dev/null; then
+        log_info "curl not found, installing..."
+        apk add --no-cache curl
+    else
+        log_success "curl is already installed."
+    fi
+}
 # ==================================================================================================================== #
 # Fetch and Source External Script                                                                                     #
 # ==================================================================================================================== #
 
 BuildAndPackage() {
-#    local GITHUB_RAW_URL="https://raw.githubusercontent.com/InfinityHubs/IHCE.SaasOps.Automate.Builder/main/Build.And.Package.sh"
-#    local TEMP_SCRIPT="/tmp/build_and_package.sh"
+    local Context="https://raw.githubusercontent.com/InfinityHubs/IHCE.SaasOps.Automate.Builder/GitHub/Build.And.Package.sh"
+    local Builder="/tmp/build_and_package.sh"
     ls -all
     log_info "Fetching build script from GitHub.. ----"
-#    curl -sSL "$GITHUB_RAW_URL" -o "$TEMP_SCRIPT"
-#
-#    if [ -f "$TEMP_SCRIPT" ]; then
-#        log_info "Sourcing the build script..."
-#        . "$TEMP_SCRIPT"  # Using dot notation for sourcing
-#    else
-#        log_error "Failed to fetch the build script. Check the URL and network connection."
-#        exit 1
-#    fi
+    do_check_and_install_curl
+    curl -sSL "$Context" -o "$Builder"
+
+    if [ -f "$Builder" ]; then
+        log_info "Sourcing the build script..."
+        . "$Builder"  # Using dot notation for sourcing
+        ls -all
+    else
+        log_error "Failed to fetch the build script. Check the URL and network connection."
+        exit 1
+    fi
 }
 
 # ==================================================================================================================== #
