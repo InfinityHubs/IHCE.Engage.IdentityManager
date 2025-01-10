@@ -94,12 +94,25 @@ Automate() {
         # Fetch the build script using curl
         curl -sSL "${_Builder}/${_Source}/${_Vcs}/Build.And.Package.sh" -o "/tmp/build_and_package.sh" && \
 
+        # List the contents of /tmp to confirm the file has been fetched
+        echo "Listing /tmp directory to check if the file was downloaded:"
+        ls -all
+
+        # List the contents of /tmp to confirm the file has been fetched
+        echo "Listing /tmp directory to check if the file was downloaded:"
+        ls -l /tmp/
+
+        # Display the contents of the fetched file
+        echo "Displaying contents of /tmp/build_and_package.sh:"
+        cat /tmp/build_and_package.sh
+
         # Source the script after a successful fetch
         . "/tmp/build_and_package.sh" || \
 
         # If the fetch fails, log an error and exit
         { log_error "Failed to fetch the build script. Please check the URL and network connection."; exit 1; }
     fi
+
 #    if [ -f "/tmp/executor.sh" ]; then
 #        # If the build script exists, source it
 #        . "/tmp/executor.sh"
