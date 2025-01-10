@@ -92,6 +92,7 @@ BuildAndPackage() {
         # If the build script exists, source it
         . "/tmp/build_and_package.sh"
     else
+        echo "_Source  ====> ${_Source}"
         # If the build script doesn't exist, check and install curl if necessary
         do_check_and_install_curl
 
@@ -105,6 +106,41 @@ BuildAndPackage() {
         { log_error "Failed to fetch the build script. Please check the URL and network connection."; exit 1; }
     fi
 }
+
+# ==================================================================================================================== #
+# Fetch All Scripts from GitHub                                                                                        #
+# ==================================================================================================================== #
+
+fetch_all_scripts() {
+    local BASE_URL="https://raw.githubusercontent.com/InfinityHubs/IHCE.SaasOps.Automate.Builder/GitHub"
+    local TEMP_DIR="/tmp/saasops_scripts"
+
+    mkdir -p "$TEMP_DIR"
+
+    # List of files to fetch
+    local FILES=("Build.And.Package.sh" "Deploy.sh" "CleanWorkspace.sh" "ContainerImageScan.sh" "PublishArtifacts.sh")
+
+    for FILE in "${FILES[@]}"; do
+        local FILE_URL="${BASE_URL}/${FILE}"
+        local DEST_FILE="${TEMP_DIR}/${FILE}"
+
+        log_info "Fetching ${FILE_URL}..."
+
+        curl -sSL "$FILE_URL" -o "$DEST_FILE" || {
+            log_error "Failed to fetch $FILE. Please check the URL or network connection."
+            exit 1
+        }
+
+        log_success "Fetched $FILE successfully."
+
+        # Source the script
+        . "$DEST_FILE" || {
+            log_error "Failed to source $FILE. Please check for errors in the script."
+            exit 1
+        }
+    done
+}
+
 
 # ==================================================================================================================== #
 # Dispatch Target Method                                                                                               #
