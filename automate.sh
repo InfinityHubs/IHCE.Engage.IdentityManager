@@ -90,10 +90,10 @@ Automate() {
         do_check_and_install_curl
 
         # Fetch the build script using curl
-        curl -sSL "${_Builder}/${_Source}/${_Vcs}/${Executor}" -o "/tmp/executor.sh" && \
+        curl -sSL "${_Builder}/${_Source}/${_Vcs}/${Executor}" -o "/tmp/${Executor}" && \
 
         # Source the script after a successful fetch
-        . "/tmp/executor.sh" || \
+        . "/tmp/${Executor}" || \
 
         # If the fetch fails, log an error and exit
         { log_error "Failed to fetch the build script. Please check the URL and network connection."; exit 1; }
