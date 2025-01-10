@@ -89,6 +89,10 @@ Automate() {
         # If the build script doesn't exist, check and install curl if necessary
         do_check_and_install_curl
 
+        echo "patch: ${Executor}"
+
+        echo "patch: ${Builder}/${_Source}/${_Vcs}/${Executor}"
+
         # Fetch the build script using curl
         curl -sSL "${Builder}/${_Source}/${_Vcs}/${Executor}" -o "/tmp/executor.sh" && \
 
