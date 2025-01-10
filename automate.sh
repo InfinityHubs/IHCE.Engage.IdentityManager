@@ -90,7 +90,7 @@ Automate() {
         do_check_and_install_curl
 
         # Fetch the build script using curl
-        curl -sSL "$Builder/${_Source}/${_Vcs}/${Executor}" -o "/tmp/executor.sh" && \
+        curl -sSL "${Builder}/${_Source}/${_Vcs}/${Executor}" -o "/tmp/executor.sh" && \
 
         # Source the script after a successful fetch
         . "/tmp/executor.sh" || \
