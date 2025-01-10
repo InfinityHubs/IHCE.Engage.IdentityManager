@@ -82,22 +82,40 @@ do_check_and_install_curl() {
 # ==================================================================================================================== #
 Automate() {
     local Executor="$1"
-    if [ -f "/tmp/executor.sh" ]; then
+    if [ -f "/tmp/build_and_package.sh" ]; then
         # If the build script exists, source it
-        . "/tmp/executor.sh"
+        . "/tmp/build_and_package.sh"
     else
+        echo "_Source  ====> ${_Source}"
         # If the build script doesn't exist, check and install curl if necessary
         do_check_and_install_curl
 
+        echo "Executor: ${Executor}"
         # Fetch the build script using curl
-        curl -sSL "${_Builder}/${_Source}/${_Vcs}/${Executor}" -o "/tmp/${Executor}" && \
+        curl -sSL "${_Builder}/${_Source}/${_Vcs}/Build.And.Package.sh" -o "/tmp/build_and_package.sh" && \
 
         # Source the script after a successful fetch
-        . "/tmp/${Executor}" || \
+        . "/tmp/build_and_package.sh" || \
 
         # If the fetch fails, log an error and exit
         { log_error "Failed to fetch the build script. Please check the URL and network connection."; exit 1; }
     fi
+#    if [ -f "/tmp/executor.sh" ]; then
+#        # If the build script exists, source it
+#        . "/tmp/executor.sh"
+#    else
+#        # If the build script doesn't exist, check and install curl if necessary
+#        do_check_and_install_curl
+#
+#        # Fetch the build script using curl
+#        curl -sSL "${_Builder}/${_Source}/${_Vcs}/${Executor}" -o "/tmp/${Executor}" && \
+#
+#        # Source the script after a successful fetch
+#        . "/tmp/${Executor}" || \
+#
+#        # If the fetch fails, log an error and exit
+#        { log_error "Failed to fetch the build script. Please check the URL and network connection."; exit 1; }
+#    fi
 }
 
 # ==================================================================================================================== #
