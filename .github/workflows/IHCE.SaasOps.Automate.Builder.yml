@@ -12,9 +12,10 @@ on:
   workflow_dispatch: null
 
 env:
-  _Source:  "Github"
+  _Vcs:  "Github"
   _Variables: ${{ toJson(vars) }}
   _Secrets: ${{ toJson(secrets) }}
+  _Source: "IHCE.SaasOps.Automate.Builder"
   _Builder: ${{ secrets.IHCE_SAASOPS_AUTOMATE_BUILDER}}
 jobs:
   Build-Build-and-Package:

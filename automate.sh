@@ -78,69 +78,27 @@ do_check_and_install_curl() {
     fi
 }
 # ==================================================================================================================== #
-# Context Builder                                                                                                      #
+# Context Builder | Fetch and Source The External Executor Script                                                      #
 # ==================================================================================================================== #
-
-IHCE_SAASOPS_AUTOMATE_BUILDER="https://raw.githubusercontent.com/InfinityHubs/IHCE.SaasOps.Automate.Builder/GitHub"
-
-# ==================================================================================================================== #
-# Fetch and Source External Script                                                                                     #
-# ==================================================================================================================== #
-
-BuildAndPackage() {
-    if [ -f "/tmp/build_and_package.sh" ]; then
+Automate() {
+    local Executor="$1"
+    if [ -f "/tmp/executor.sh" ]; then
         # If the build script exists, source it
-        . "/tmp/build_and_package.sh"
+        . "/tmp/executor.sh"
     else
-        echo "_Source  ====> ${_Source}"
         # If the build script doesn't exist, check and install curl if necessary
         do_check_and_install_curl
 
         # Fetch the build script using curl
-        curl -sSL "$IHCE_SAASOPS_AUTOMATE_BUILDER/Build.And.Package.sh" -o "/tmp/build_and_package.sh" && \
+        curl -sSL "$Builder/${_Source}/${_Vcs}/${Executor}" -o "/tmp/executor.sh" && \
 
         # Source the script after a successful fetch
-        . "/tmp/build_and_package.sh" || \
+        . "/tmp/executor.sh" || \
 
         # If the fetch fails, log an error and exit
         { log_error "Failed to fetch the build script. Please check the URL and network connection."; exit 1; }
     fi
 }
-
-# ==================================================================================================================== #
-# Fetch All Scripts from GitHub                                                                                        #
-# ==================================================================================================================== #
-
-#fetch_all_scripts() {
-#    local BASE_URL="https://raw.githubusercontent.com/InfinityHubs/IHCE.SaasOps.Automate.Builder/GitHub"
-#    local TEMP_DIR="/tmp/saasops_scripts"
-#
-#    mkdir -p "$TEMP_DIR"
-#
-#    # List of files to fetch
-#    local FILES=("Build.And.Package.sh" "Deploy.sh" "CleanWorkspace.sh" "ContainerImageScan.sh" "PublishArtifacts.sh")
-#
-#    for FILE in "${FILES[@]}"; do
-#        local FILE_URL="${BASE_URL}/${FILE}"
-#        local DEST_FILE="${TEMP_DIR}/${FILE}"
-#
-#        log_info "Fetching ${FILE_URL}..."
-#
-#        curl -sSL "$FILE_URL" -o "$DEST_FILE" || {
-#            log_error "Failed to fetch $FILE. Please check the URL or network connection."
-#            exit 1
-#        }
-#
-#        log_success "Fetched $FILE successfully."
-#
-#        # Source the script
-#        . "$DEST_FILE" || {
-#            log_error "Failed to source $FILE. Please check for errors in the script."
-#            exit 1
-#        }
-#    done
-#}
-
 
 # ==================================================================================================================== #
 # Dispatch Target Method                                                                                               #
@@ -195,30 +153,22 @@ dispatch_target "$@"
 log_info "Executing command: $COMMAND"
 
 # Log Variables and Secrets only if provided
-if [ -n "$VARIABLES" ]; then
-    log_info "Variables: $VARIABLES"
-else
-    log_info "No Variables provided."
-fi
+[ -n "$VARIABLES" ] && log_info "Variables: $VARIABLES" || log_info "No Variables provided."
+[ -n "$SECRETS" ] && log_info "Secrets: $SECRETS" || log_info "No Secrets provided."
 
-if [ -n "$SECRETS" ]; then
-    log_info "Secrets: $SECRETS"
-else
-    log_info "No Secrets provided."
-fi
 
 case "$COMMAND" in
     Build)
-        BuildAndPackage
+        Automate "Build.And.Package.sh"
         ;;
     Scan)
-        ContainerImageScan
+        Automate "ContainerImageScan.sh"
         ;;
     Publish)
-        PublishArtifacts
+        Automate "PublishArtifacts.sh"
         ;;
     CleanWorkspace)
-        CleanWorkspace
+        Automate "CleanWorkspace.sh"
         ;;
     *)
         log_error "Invalid command: $COMMAND. Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace}"
