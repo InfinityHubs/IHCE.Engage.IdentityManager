@@ -81,37 +81,8 @@ do_check_and_install_curl() {
 # Context Builder | Fetch and Source The External Executor Script                                                      #
 # ==================================================================================================================== #
 Automate() {
+    # Executor Argument
     local Executor="$1"
-#    if [ -f "/tmp/build_and_package.sh" ]; then
-#        # If the build script exists, source it
-#        . "/tmp/build_and_package.sh"
-#    else
-#        echo "_Source  ====> ${_Source}"
-#        # If the build script doesn't exist, check and install curl if necessary
-#        do_check_and_install_curl
-#
-#        echo "Executor: ${Executor}"
-#        # Fetch the build script using curl
-#        curl -sSL "${_Builder}/${_Source}/${_Vcs}/Build.And.Package.sh" -o "/tmp/build_and_package.sh" && \
-#
-#        # List the contents of /tmp to confirm the file has been fetched
-#        echo "Listing /tmp directory to check if the file was downloaded:"
-#        ls -all
-#
-#        # List the contents of /tmp to confirm the file has been fetched
-#        echo "Listing /tmp directory to check if the file was downloaded:"
-#        ls -l /tmp/
-#
-#        # Display the contents of the fetched file
-#        echo "Displaying contents of /tmp/build_and_package.sh:"
-#        cat /tmp/build_and_package.sh
-#
-#        # Source the script after a successful fetch
-#        . "/tmp/build_and_package.sh" || \
-#
-#        # If the fetch fails, log an error and exit
-#        { log_error "Failed to fetch the build script. Please check the URL and network connection."; exit 1; }
-#    fi
 
     if [ -f "/tmp/${Executor}" ]; then
         # If the build script exists, source it
@@ -121,7 +92,7 @@ Automate() {
         do_check_and_install_curl
 
         # Fetch the build script using curl
-        curl -sSL "${_Builder}/${_Source}/${_Vcs}/${Executor}" -o "/tmp/${Executor}" && \
+        curl -sSL "${_Source}/${_Space}/${_Vcs}/${Executor}" -o "/tmp/${Executor}" && \
 
         # Listing the builder directory.
         echo "Listing the builder directory."
@@ -135,7 +106,7 @@ Automate() {
         . "/tmp/${Executor}" || \
 
         # If the fetch fails, log an error and exit
-        { log_error "Failed to fetch the build script. Please check the URL --> ${_Builder}/${_Source}/${_Vcs}/${Executor} and network connection."; exit 1; }
+        { log_error "Failed to fetch the build script. Please check the URL --> ${_Source}/${_Space}/${_Vcs}/${Executor} and network connection."; exit 1; }
     fi
 }
 
