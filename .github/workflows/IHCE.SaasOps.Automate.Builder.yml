@@ -110,6 +110,11 @@ jobs:
         run: |
           echo "Invoking Artifact Publishing"
           sh ./automate.sh --Target Publish
+      - name: Clean Automate Target Workspace
+        if: ${{ success() }}
+        run: |
+          echo "Cleaning up Automate Target Workspace"
+          sh ./automate.sh --Target CleanWorkspace
     if: github.ref == 'refs/heads/main'
 
   Publish-Unstable-Artifacts:
@@ -140,4 +145,9 @@ jobs:
         run: |
           echo "Invoking Artifact Publishing"
           sh ./automate.sh --Target Publish
+      - name: Clean Automate Target Workspace
+        if: ${{ success() }}
+        run: |
+          echo "Cleaning up Automate Target Workspace"
+          sh ./automate.sh --Target CleanWorkspace
     if: github.ref != 'refs/heads/main'
