@@ -77,6 +77,11 @@ do_check_and_install_curl() {
         log_success "curl is already installed."
     fi
 }
+
+# Artifacts Global Variables
+ARTIFACTS_DIR="Build-Runner-Artifacts"
+ARTIFACTS_DIR_CR_IMAGE="Build-Runner-Artifacts/SaasOps-Automate-CR-Image"
+
 # ==================================================================================================================== #
 # Context Builder | Fetch and Source The External Executor Script                                                      #
 # ==================================================================================================================== #
@@ -169,7 +174,7 @@ log_info "Executing command: $COMMAND"
 
 case "$COMMAND" in
     Build)
-        Automate "Build.And.Package.sh"
+        Automate "BuildAndPackage.sh"
         ;;
     Scan)
         Automate "ContainerImageScan.sh"
