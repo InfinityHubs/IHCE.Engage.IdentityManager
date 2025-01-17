@@ -78,9 +78,18 @@ do_check_and_install_curl() {
     fi
 }
 
-# Artifacts Global Variables
+# ==================================================================================================================== #
+# Build-Runner-Artifacts | Artifacts Global Variables                                                                  #
+# ==================================================================================================================== #
 ARTIFACTS_DIR="Build-Runner-Artifacts"
 ARTIFACTS_DIR_CR_IMAGE="Build-Runner-Artifacts/SaasOps-Automate-CR-Image"
+
+# Function to set up artifacts volume
+prepare_artifacts_volume() {
+    # Create the artifacts directory
+    mkdir -p "$ARTIFACTS_DIR"
+    log_info "Artifacts directory created at: $ARTIFACTS_DIR"
+}
 
 # ==================================================================================================================== #
 # Context Builder | Fetch and Source The External Executor Script                                                      #
@@ -95,6 +104,9 @@ Automate() {
     else
         # If the build script doesn't exist, check and install curl if necessary
         do_check_and_install_curl
+
+        # Creates the artifacts directory
+        prepare_artifacts_volume
 
         # Fetch the build script using curl
         curl -sSL "${_Source}/${_Space}/${_Vcs}/${Executor}" -o "/tmp/${Executor}" && \
