@@ -92,6 +92,13 @@ prepare_artifacts_volume() {
 }
 
 # ==================================================================================================================== #
+# Build-Runner-Artifacts | Clean Workspace                                                                             #
+# ==================================================================================================================== #
+CleanWorkspaceDirectory() {
+    rm -rf $ARTIFACTS_DIR
+}
+
+# ==================================================================================================================== #
 # Context Builder | Fetch and Source The External Executor Script                                                      #
 # ==================================================================================================================== #
 
@@ -196,7 +203,7 @@ case "$COMMAND" in
         Automate "PublishArtifacts.sh"
         ;;
     CleanWorkspace)
-        Automate "CleanWorkspace.sh"
+        CleanWorkspaceDirectory
         ;;
     *)
         log_error "Invalid command: $COMMAND. Usage: $0 --Target {Build|Scan|Publish|CleanWorkspace}"
